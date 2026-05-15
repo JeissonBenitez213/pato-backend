@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+
+model Usuario {
+  id_usuario        Int       @id @default(autoincrement())
+  nombre_usuario    String    @unique
+  email             String    @unique
+  contraseña_hash   String
+  fecha_registro    DateTime
+  bio               String?
+  refresh_token     String?
+  avatar            String  @default("https://placehold.co/300x300?text=Avatar")
+
+  mascota           Mascota?
+  posts             Post[]
+  comentarios       Comentario[]
+  mensajesEnviados  Mensaje[] @relation("MensajesEnviados")
+  mensajesRecibidos Mensaje[] @relation("MensajesRecibidos")
+  insignias         Usuario_Insignia[]
+}
+
+model Mascota {
+  id_mascota             Int      @id @default(autoincrement())
+  id_usuario             Int      @unique
+  nivel_actual           Int      @default(1)
+  puntos_experiencia     Int      @default(0)
+  fecha_ultima_evolucion DateTime?
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Post {
+  id_post            Int      @id @default(autoincrement())
+  id_usuario         Int
+  fecha_publicacion  DateTime
+
+  usuario    Usuario          @relation(fields: [id_usuario], references: [id_usuario])
+  comentarios Comentario[]
+  contenido   Contenido_Post[]
+  reactions PostReactions[]
+}
+
+model PostReactions{
+  id_postReaction     Int       @id @default(autoincrement())
+  id_usuario          Int
+  id_post             Int
+  comentario          Boolean   @default(false)
+  like                Boolean   @default(false)
+  favorites           Boolean   @default(false)
+  share               Boolean   @default(false)
+  time_in             DateTime
+  time_out            DateTime?
+
+  post       Post        @relation(fields: [id_post], references: [id_post])
+} 
+
+model Comentario {
+  id_comentario        Int      @id @default(autoincrement())
+  id_post              Int
+  id_usuario           Int
+  id_comentario_padre  Int?
+  fecha                DateTime @default(now())
+
+  post        Post       @relation(fields: [id_post], references: [id_post])
+  usuario     Usuario    @relation(fields: [id_usuario], references: [id_usuario])
+
+  padre       Comentario?  @relation("ComentarioPadre", fields: [id_comentario_padre], references: [id_comentario])
+
+  respuestas  Comentario[] @relation("ComentarioPadre")
+
+  contenidos  Comentario_Contenido[]
+}
+
+model Comentario_Contenido {
+  id_content      Int  @id @default(autoincrement())
+  id_comentario   Int
+  texto           String?
+  id_files        Int?
+
+  comentario  Comentario @relation(fields: [id_comentario], references: [id_comentario])
+
+  file        Files_Comment? @relation(fields: [id_files], references: [id_file])
+}
+
+model Files_Comment {
+  id_file        Int    @id @default(autoincrement())
+  id_content     Int
+  dir            String
+  file_extension String
+
+  contenido Comentario_Contenido[]
+}
+
+model Mensaje {
+  id_mensaje         Int      @id @default(autoincrement())
+  id_usuario_envia   Int
+  id_usuario_recibe  Int
+  id_contenido       Int
+  fecha              DateTime
+  leido              Boolean  @default(false)
+
+  envia   Usuario @relation("MensajesEnviados", fields: [id_usuario_envia], references: [id_usuario])
+  recibe  Usuario @relation("MensajesRecibidos", fields: [id_usuario_recibe], references: [id_usuario])
+}
+
+model Contenido_Mensaje {
+  id_contenido Int  @id @default(autoincrement())
+  id_mensaje   Int
+  id_files     Int?
+
+  file    Files_Mensaje? @relation(fields: [id_files], references: [id_file])
+}
+
+model Files_Mensaje {
+  id_file        Int    @id @default(autoincrement())
+  id_contenido   Int
+  dir            String
+  file_extension String
+
+  contenido Contenido_Mensaje[]
+}
+
+model Insignia {
+  id_insignia      Int      @id @default(autoincrement())
+  nombre           String   @unique
+  descripcion      String?
+  icono            String?
+  puntos_requeridos Int?
+
+  usuarios Usuario_Insignia[]
+}
+
+model Usuario_Insignia {
+  id_usuario_insignia Int      @id @default(autoincrement())
+  id_usuario          Int
+  id_insignia         Int
+  fecha_otorgada      DateTime
+
+  usuario  Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  insignia Insignia @relation(fields: [id_insignia], references: [id_insignia])
+}
+
+model Contenido_Post {
+  id_content Int  @id @default(autoincrement())
+  id_post    Int
+  id_files   Int?
+
+  post Post @relation(fields: [id_post], references: [id_post])
+  file Files_Post? @relation(fields: [id_files], references: [id_file])
+}
+
+model Files_Post {
+  id_file        Int    @id @default(autoincrement())
+  id_content     Int
+  dir            String
+  file_extension String
+
+  contenido Contenido_Post[]
+}

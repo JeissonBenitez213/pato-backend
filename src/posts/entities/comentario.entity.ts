@@ -1,0 +1,33 @@
+import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
+import { Post } from './post.entity';
+import { ContentComentario } from './comentarioContent.entity';
+
+@ObjectType()
+export class Comentario {
+  @Field(() => Int)
+  id_comentario!: number;
+
+  @Field(() => Int)
+  id_post!: number;
+
+  @Field(() => Int)
+  id_usuario!: number;
+
+  @Field(() => Int, { nullable: true })
+  id_comentario_padre!: number | null;
+
+  @Field(() => GraphQLISODateTime)
+  Fecha!: Date;
+
+  @Field(() => Post)
+  Post!: Post;
+
+  @Field(() => Comentario, { nullable: true })
+  Padre!: Comentario | null;
+
+  @Field(() => [Comentario], { nullable: true })
+  Respuestas!: Comentario[];
+
+  @Field(() => [ContentComentario], { nullable: true })
+  Contenido!: ContentComentario[];
+}
