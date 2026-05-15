@@ -96,6 +96,25 @@ model Comentario {
   respuestas  Comentario[] @relation("ComentarioPadre")
 
   files Files_Comment[]
+
+  reactions ComentarioReactions[]
+}
+
+model ComentarioReactions {
+  id_reaction Int @id @default(autoincrement())
+
+  id_usuario Int
+  id_comment Int
+
+  commented  Boolean  @default(false)
+  like       Boolean  @default(false)
+  favorites  Boolean  @default(false)
+  share      Boolean  @default(false)
+
+  time_in    DateTime @default(now())
+  time_out   DateTime?
+
+  comment Comentario @relation(fields: [id_comment], references: [id_comentario])
 }
 
 
