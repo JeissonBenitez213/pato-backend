@@ -1,7 +1,7 @@
 import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { PostReactions } from './postReactions.entity';
 import { Comentario } from 'src/comments/entities/comentario.entity';
-import { PostContent } from './postContent.entity';
+import { PostFiles } from './postFiles.entity';
 
 @ObjectType()
 export class Post {
@@ -11,14 +11,20 @@ export class Post {
   @Field(() => Int)
   id_usuario!: number;
 
+  @Field(() => String)
+  Title!: string;
+
+  @Field(() => String, { nullable: true })
+  Description!: string | null;
+
   @Field(() => GraphQLISODateTime)
   fecha_publicacion!: Date;
 
   @Field(() => [Comentario], { nullable: true })
   Comentarios!: Comentario[] | null;
 
-  @Field(() => [PostContent], { nullable: true })
-  Contenido!: PostContent | null;
+  @Field(() => [PostFiles], { nullable: true })
+  Files!: PostFiles[] | null;
 
   @Field(() => [PostReactions], { nullable: true })
   Reactions!: PostReactions[] | null;

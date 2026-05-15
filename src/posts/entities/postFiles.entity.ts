@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { PostContent } from './postContent.entity';
+import { Post } from './post.entity';
 
 @ObjectType()
 export class PostFiles {
@@ -7,7 +7,7 @@ export class PostFiles {
   id_file!: number;
 
   @Field(() => Int)
-  id_content!: number;
+  id_post!: number;
 
   @Field(() => String)
   dir!: string;
@@ -15,6 +15,6 @@ export class PostFiles {
   @Field(() => String)
   file_extension!: string;
 
-  @Field(() => PostContent)
-  contenido!: PostContent;
+  @Field(() => Post)
+  post!: Post;
 }
