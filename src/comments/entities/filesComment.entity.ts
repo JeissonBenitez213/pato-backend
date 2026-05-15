@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { ContentComentario } from '../../comments/entities/comentarioContent.entity';
+import { Comentario } from './comentario.entity';
 
 @ObjectType()
 export class FilesComment {
@@ -7,7 +7,7 @@ export class FilesComment {
   id_file!: number;
 
   @Field(() => Int)
-  id_content!: number;
+  id_comment!: number;
 
   @Field(() => String)
   Dir!: string;
@@ -15,6 +15,6 @@ export class FilesComment {
   @Field(() => String)
   File_extension!: string;
 
-  @Field(() => [ContentComentario], { nullable: true })
-  Contenido!: ContentComentario[];
+  @Field(() => [Comentario], { nullable: true })
+  Contenido!: Comentario[];
 }
