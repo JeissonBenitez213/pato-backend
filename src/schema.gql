@@ -1,0 +1,79 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type PostReactions {
+  id_postReaction: Int!
+  id_usuario: Int!
+  id_comentario: Int!
+  Comentario: Boolean!
+  Like: Boolean!
+  Favorites: Boolean!
+  Share: Boolean!
+  Time_in: DateTime!
+  Time_out: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FilesComment {
+  id_file: Int!
+  id_content: Int!
+  Dir: String!
+  File_extension: String!
+  Contenido: [ContentComentario!]
+}
+
+type ContentComentario {
+  id_content: Int!
+  id_comentario: Int!
+  texto: String
+  id_files: Int
+  Comentario: Comentario!
+  File: FilesComment
+}
+
+type Comentario {
+  id_comentario: Int!
+  id_post: Int!
+  id_usuario: Int!
+  id_comentario_padre: Int
+  Fecha: DateTime!
+  Post: Post!
+  Padre: Comentario
+  Respuestas: [Comentario!]
+  Contenido: [ContentComentario!]
+}
+
+type Post {
+  id_post: Int!
+  id_user: Int!
+  fecha_publicacion: DateTime!
+  Reactions: [PostReactions!]
+  Comentarios: [Comentario!]
+}
+
+type Query {
+  posts: [Post!]!
+  post(id: Int!): Post!
+}
+
+type Mutation {
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: Int!): Post!
+}
+
+input CreatePostInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdatePostInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}

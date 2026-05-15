@@ -13,12 +13,9 @@ export class ContentComentario {
   @Field(() => String, { nullable: true })
   texto!: string | null;
 
-  @Field(() => Int, { nullable: true })
-  id_files!: number | null;
-
   @Field(() => Comentario)
   Comentario!: Comentario;
 
-  @Field(() => FilesComment, { nullable: true })
-  File!: FilesComment | null;
+  @Field(() => [FilesComment], { nullable: true })
+  Files!: FilesComment[] | null;
 }

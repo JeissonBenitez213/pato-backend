@@ -1,4 +1,5 @@
 import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
+import { Post } from './post.entity';
 
 @ObjectType()
 export class PostReactions {
@@ -9,7 +10,7 @@ export class PostReactions {
   id_usuario!: number;
 
   @Field(() => Int)
-  id_comentario!: number;
+  id_post!: number;
 
   @Field(() => Boolean)
   Comentario!: boolean;
@@ -28,4 +29,7 @@ export class PostReactions {
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   Time_out!: Date | null;
+
+  @Field(() => Post)
+  Post!: Post;
 }
