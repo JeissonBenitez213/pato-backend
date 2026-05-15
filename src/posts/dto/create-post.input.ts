@@ -1,5 +1,5 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 import { AddContent } from './add-content.input';
 
 @InputType()
@@ -9,6 +9,8 @@ export class CreatePostInput {
   @Field(() => Int)
   id_usuario!: number;
 
+  @IsArray()
+  @ArrayNotEmpty()
   @Field(() => [AddContent], { nullable: true })
-  contenido?: AddContent[];
+  contenido!: AddContent[];
 }
