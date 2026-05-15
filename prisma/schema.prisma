@@ -45,7 +45,7 @@ model Mascota {
 model Post {
   id_post            Int      @id @default(autoincrement())
   id_usuario         Int
-  fecha_publicacion  DateTime
+  fecha_publicacion  DateTime @default(now())
 
   usuario    Usuario          @relation(fields: [id_usuario], references: [id_usuario])
   comentarios Comentario[]
@@ -61,11 +61,29 @@ model PostReactions{
   like                Boolean   @default(false)
   favorites           Boolean   @default(false)
   share               Boolean   @default(false)
-  time_in             DateTime
+  time_in             DateTime  @default(now())
   time_out            DateTime?
 
   post       Post        @relation(fields: [id_post], references: [id_post])
 } 
+
+model Contenido_Post {
+  id_content Int @id @default(autoincrement())
+  id_post    Int
+
+  post Post @relation(fields: [id_post], references: [id_post])
+
+  files Files_Post[]
+}
+
+model Files_Post {
+  id_file        Int    @id @default(autoincrement())
+  id_content     Int
+  dir            String
+  file_extension String
+
+  contenido Contenido_Post @relation(fields: [id_content], references: [id_content])
+}
 
 model Comentario {
   id_comentario        Int      @id @default(autoincrement())
@@ -85,23 +103,22 @@ model Comentario {
 }
 
 model Comentario_Contenido {
-  id_content      Int  @id @default(autoincrement())
-  id_comentario   Int
-  texto           String?
-  id_files        Int?
+  id_content    Int @id @default(autoincrement())
+  id_comentario Int
+  texto         String?
 
-  comentario  Comentario @relation(fields: [id_comentario], references: [id_comentario])
+  comentario Comentario @relation(fields: [id_comentario], references: [id_comentario])
 
-  file        Files_Comment? @relation(fields: [id_files], references: [id_file])
+  files Files_Comment[]
 }
 
 model Files_Comment {
-  id_file        Int    @id @default(autoincrement())
+  id_file        Int @id @default(autoincrement())
   id_content     Int
   dir            String
   file_extension String
 
-  contenido Comentario_Contenido[]
+  contenido Comentario_Contenido @relation(fields: [id_content], references: [id_content])
 }
 
 model Mensaje {
@@ -153,20 +170,3 @@ model Usuario_Insignia {
   insignia Insignia @relation(fields: [id_insignia], references: [id_insignia])
 }
 
-model Contenido_Post {
-  id_content Int  @id @default(autoincrement())
-  id_post    Int
-  id_files   Int?
-
-  post Post @relation(fields: [id_post], references: [id_post])
-  file Files_Post? @relation(fields: [id_files], references: [id_file])
-}
-
-model Files_Post {
-  id_file        Int    @id @default(autoincrement())
-  id_content     Int
-  dir            String
-  file_extension String
-
-  contenido Contenido_Post[]
-}
