@@ -5,13 +5,14 @@
 type PostReactions {
   id_postReaction: Int!
   id_usuario: Int!
-  id_comentario: Int!
+  id_post: Int!
   Comentario: Boolean!
   Like: Boolean!
   Favorites: Boolean!
   Share: Boolean!
   Time_in: DateTime!
   Time_out: DateTime
+  Post: Post!
 }
 
 """
@@ -21,19 +22,21 @@ scalar DateTime
 
 type FilesComment {
   id_file: Int!
-  id_content: Int!
+  id_comment: Int!
   Dir: String!
   File_extension: String!
-  Contenido: [ContentComentario!]
+  Contenido: [Comentario!]
 }
 
-type ContentComentario {
-  id_content: Int!
-  id_comentario: Int!
-  texto: String
-  id_files: Int
-  Comentario: Comentario!
-  File: FilesComment
+type ComentarioReactions {
+  id_reaction: Int!
+  id_usuario: Int!
+  id_comment: Int!
+  commented: Boolean!
+  like: Boolean!
+  share: Boolean!
+  time_in: DateTime!
+  comment: Comentario!
 }
 
 type Comentario {
@@ -42,37 +45,65 @@ type Comentario {
   id_usuario: Int!
   id_comentario_padre: Int
   Fecha: DateTime!
+  texto: String
   Post: Post!
   Padre: Comentario
   Respuestas: [Comentario!]
-  Contenido: [ContentComentario!]
+  files: [FilesComment!]
+  reactions: [ComentarioReactions!]
+}
+
+type PostFiles {
+  id_file: Int!
+  id_post: Int!
+  dir: String!
+  file_extension: String!
+  post: Post!
+}
+
+type PostStats {
+  comentarios: Int!
+  likes: Int!
+  favorites: Int!
+  shares: Int!
 }
 
 type Post {
   id_post: Int!
-  id_user: Int!
+  id_usuario: Int!
+  Title: String!
+  Description: String
   fecha_publicacion: DateTime!
-  Reactions: [PostReactions!]
   Comentarios: [Comentario!]
+  Files: [PostFiles!]
+  Reactions: [PostReactions!]
+  stats: PostStats!
 }
 
 type Query {
+  postsByFilter(filter: SearchPostInput!): [Post!]!
   posts: [Post!]!
-  post(id: Int!): Post!
+  comments: [Comentario!]!
+  comment(id: Int!): Comentario!
+}
+
+input SearchPostInput {
+  search: String
+  username: String
 }
 
 type Mutation {
-  createPost(createPostInput: CreatePostInput!): Post!
-  updatePost(updatePostInput: UpdatePostInput!): Post!
-  removePost(id: Int!): Post!
+  createComment(createCommentInput: CreateCommentInput!): Comentario!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
+  removeComment(id: Int!): Comentario!
 }
 
-input CreatePostInput {
+input CreateCommentInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdatePostInput {
+input UpdateCommentInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!

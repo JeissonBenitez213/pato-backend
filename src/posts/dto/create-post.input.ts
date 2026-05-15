@@ -1,6 +1,6 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
 import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber } from 'class-validator';
-import { AddContent } from './add-content.input';
+import { AddFile } from './add-file.input';
 
 @InputType()
 export class CreatePostInput {
@@ -11,6 +11,6 @@ export class CreatePostInput {
 
   @IsArray()
   @ArrayNotEmpty()
-  @Field(() => [AddContent], { nullable: true })
-  contenido!: AddContent[];
+  @Field(() => [AddFile], { nullable: true })
+  contenido!: AddFile[];
 }
