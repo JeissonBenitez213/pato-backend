@@ -1,6 +1,6 @@
 import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { PostReactions } from './postReactions.entity';
-import { Comentario } from './comentario.entity';
+import { Comentario } from 'src/comments/entities/comentario.entity';
 import { PostContent } from './postContent.entity';
 
 @ObjectType()

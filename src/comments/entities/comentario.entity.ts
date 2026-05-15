@@ -1,5 +1,5 @@
 import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
-import { Post } from './post.entity';
+import { Post } from 'src/posts/entities/post.entity';
 import { ContentComentario } from './comentarioContent.entity';
 
 @ObjectType()

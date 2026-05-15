@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { ContentComentario } from './comentarioContent.entity';
+import { ContentComentario } from '../../comments/entities/comentarioContent.entity';
 
 @ObjectType()
 export class FilesComment {
