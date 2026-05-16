@@ -18,11 +18,13 @@ model Usuario {
   id_usuario        Int       @id @default(autoincrement())
   nombre_usuario    String    @unique
   email             String    @unique
+  descripcion       String?
   contraseña_hash   String
   fecha_registro    DateTime
   bio               String?
   refresh_token     String?
   avatar            String  @default("https://placehold.co/300x300?text=Avatar")
+  is_admin          Boolean @default(false)
 
   mascota           Mascota?
   posts             Post[]
@@ -30,6 +32,24 @@ model Usuario {
   mensajesEnviados  Mensaje[] @relation("MensajesEnviados")
   mensajesRecibidos Mensaje[] @relation("MensajesRecibidos")
   insignias         Usuario_Insignia[]
+
+  siguiendo Follow[] @relation("Siguiendo")
+  seguidores Follow[] @relation("Seguidores")
+  postReactions PostReactions[]
+  commentReactions ComentarioReactions[]
+}
+
+model Follow{
+  follower_id Int
+  following_id Int
+
+  createdAt DateTime @default(now())
+
+  follower Usuario @relation("Siguiendo",fields: [follower_id], references: [id_usuario])
+
+  following Usuario @relation("Seguidores",fields: [following_id],references: [id_usuario])
+
+  @@id([follower_id,following_id])
 }
 
 model Mascota {
@@ -68,6 +88,8 @@ model PostReactions{
   time_out            DateTime?
 
   post       Post        @relation(fields: [id_post], references: [id_post])
+
+  usuario Usuario @relation(fields: [id_usuario],references: [id_usuario])
 } 
 
 
@@ -114,6 +136,8 @@ model ComentarioReactions {
   time_out   DateTime?
 
   comment Comentario @relation(fields: [id_comment], references: [id_comentario])
+
+  usuario Usuario @relation(fields: [id_usuario],references: [id_usuario])
 }
 
 
@@ -130,6 +154,7 @@ model Mensaje {
   id_mensaje         Int      @id @default(autoincrement())
   id_usuario_envia   Int
   id_usuario_recibe  Int
+  texto              String
   fecha              DateTime
   leido              Boolean  @default(false)
 
@@ -159,12 +184,13 @@ model Insignia {
 }
 
 model Usuario_Insignia {
-  id_usuario_insignia Int      @id @default(autoincrement())
   id_usuario          Int
   id_insignia         Int
-  fecha_otorgada      DateTime
+  fecha_otorgada      DateTime @default(now())
 
   usuario  Usuario  @relation(fields: [id_usuario], references: [id_usuario])
   insignia Insignia @relation(fields: [id_insignia], references: [id_insignia])
+
+  @@id([id_insignia,id_usuario])
 }
 
