@@ -57,7 +57,7 @@ model Mascota {
   id_usuario             Int      @unique
   nivel_actual           Int      @default(1)
   puntos_experiencia     Int      @default(0)
-  fecha_ultima_evolucion DateTime?
+  fecha_ultima_evolucion DateTime @default(now())
 
   usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
 }
