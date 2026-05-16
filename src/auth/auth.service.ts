@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'bcrypt';
+import { LoginAuth } from './dto/loginAuth.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,10 @@ export class AuthService {
     });
 
     if (!user) {
+      throw new UnauthorizedException('usuario o contraseña incorrectos');
+    }
+
+    if (!user.contraseña_hash) {
       throw new UnauthorizedException('usuario o contraseña incorrectos');
     }
 
@@ -84,7 +89,38 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async register() {}
+  async loginOAuth(data: LoginAuth) {
+    const user = await this.prisma.authAcount.findUnique({
+      where: {
+        provider_provider_id: {
+          provider: data.provider,
+          provider_id: data.provider_id,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
 
-  async logout() {}
+    if (!user) {
+      throw new UnauthorizedException('invalid credentials');
+    }
+
+    return user.user;
+  }
+
+  async logout(refreshToken: string) {
+    const payload = this.jwtService.verify(refreshToken, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+
+    const logouted = await this.prisma.usuario.update({
+      where: { id_usuario: payload.sub },
+      data: {
+        refresh_token: null,
+      },
+    });
+
+    return logouted;
+  }
 }

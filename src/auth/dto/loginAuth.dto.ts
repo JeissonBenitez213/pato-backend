@@ -1,11 +1,12 @@
 import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginAuth {
+  @IsNotEmpty()
   @IsString()
   @IsIn(['google', 'github'])
   provider!: string;
 
   @IsNotEmpty()
   @IsString()
-  code!: string;
+  provider_id!: string;
 }
