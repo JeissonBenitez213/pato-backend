@@ -50,6 +50,20 @@ type Follow {
   Following: User!
 }
 
+type Badge {
+  id_insignia: Int!
+  nombre: String!
+  descripcion: String
+  icono: String
+}
+
+type BadgesUsers {
+  id_usuario: Int!
+  id_insignia: Int!
+  fecha_otorgada: DateTime!
+  insignia: Badge!
+}
+
 type User {
   id_usuario: Int!
   nombre_usuario: String!
@@ -57,10 +71,12 @@ type User {
   descripcion: String
   fecha_registro: DateTime!
   avatar: String!
+  is_admin: Boolean!
   posts: [Post!]
   comentarios: [Comentario!]
   siguiendo: [Follow!]
   seguidores: [Follow!]
+  insignias: [BadgesUsers!]
 }
 
 type PostReactions {
@@ -106,12 +122,15 @@ type Post {
 }
 
 type Pet {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  id_mascota: Int!
+  id_usuario: Int!
+  nivel_actual: Int!
+  puntos_experiencia: Int!
+  fecha_ultima_evolucion: DateTime!
 }
 
 type Query {
-  postsByFilter(filter: SearchPostInput!): [Post!]!
+  searchPosts(filter: SearchPostInput!): [Post!]!
   posts: [Post!]!
   comments: [Comentario!]!
   comment(id: Int!): Comentario!

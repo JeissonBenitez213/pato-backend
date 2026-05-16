@@ -12,74 +12,47 @@ export class PostsService {
     return 'This action adds a new post';
   }
 
-  async findAll() {
-    const data = await this.prisma.post.findMany({
-      include: {
-        usuario: {
-          select: {
-            id_usuario: true,
-            nombre_usuario: true,
-            avatar: true,
-          },
-        },
-
-        files: {
-          select: {
-            id_file: true,
-            dir: true,
-            file_extension: true,
-          },
-        },
-
-        _count: {
-          select: {
-            comentarios: true,
-          },
-        },
-
-        reactions: {
-          select: {
-            like: true,
-            favorites: true,
-            share: true,
-          },
-        },
-      },
-    });
-
-    const formatted = data.map((post) => {
-      const likes = post.reactions.filter((reaction) => reaction.like).length;
-
-      const favorites = post.reactions.filter(
-        (reaction) => reaction.favorites,
-      ).length;
-
-      const shares = post.reactions.filter((reaction) => reaction.share).length;
-
-      return {
-        id_post: post.id_post,
-        title: post.title,
-        description: post.description,
-        fecha_publicacion: post.fecha_publicacion,
-
-        usuario: post.usuario,
-
-        files: post.files,
-
-        stats: {
-          comentarios: post._count.comentarios,
-          likes,
-          favorites,
-          shares,
-        },
-      };
-    });
-
-    return formatted;
+  async findAll(select: any) {
+    const data = await this.prisma.post.findMany({ ...select });
+    return data;
   }
 
-  async findByFilter(filter: SearchPostInput) {
-    const data = await this.prisma.post.findMany({
+  async getStats(id_post: number) {
+    const [comentarios, reactions] = await Promise.all([
+      this.prisma.comentario.count({
+        where: {
+          id_post,
+        },
+      }),
+
+      this.prisma.postReactions.findMany({
+        where: {
+          id_post,
+        },
+
+        select: {
+          like: true,
+          favorites: true,
+          share: true,
+        },
+      }),
+    ]);
+
+    return {
+      comentarios,
+
+      likes: reactions.filter((r) => r.like).length,
+
+      favorites: reactions.filter((r) => r.favorites).length,
+
+      shares: reactions.filter((r) => r.share).length,
+    };
+  }
+
+  async findByFilter(filter: SearchPostInput, select: any) {
+    return this.prisma.post.findMany({
+      ...select,
+
       where: {
         AND: [
           filter.search
@@ -88,74 +61,37 @@ export class PostsService {
                   {
                     title: {
                       contains: filter.search,
+                      mode: 'insensitive',
                     },
                   },
 
                   {
                     description: {
                       contains: filter.search,
+                      mode: 'insensitive',
                     },
                   },
                 ],
               }
-            : {},
+            : undefined,
 
           filter.username
             ? {
                 usuario: {
                   nombre_usuario: {
                     contains: filter.username,
+                    mode: 'insensitive',
                   },
                 },
               }
-            : {},
+            : undefined,
         ],
-      },
-
-      include: {
-        usuario: {
-          select: {
-            id_usuario: true,
-            nombre_usuario: true,
-            avatar: true,
-          },
-        },
-
-        files: true,
-
-        _count: {
-          select: {
-            comentarios: true,
-          },
-        },
-
-        reactions: {
-          select: {
-            like: true,
-            favorites: true,
-            share: true,
-          },
-        },
       },
 
       orderBy: {
         fecha_publicacion: 'desc',
       },
     });
-
-    return data.map((post) => ({
-      ...post,
-
-      stats: {
-        comentarios: post._count.comentarios,
-
-        likes: post.reactions.filter((r) => r.like).length,
-
-        favorites: post.reactions.filter((r) => r.favorites).length,
-
-        shares: post.reactions.filter((r) => r.share).length,
-      },
-    }));
   }
 
   update(id: number, updatePostInput: UpdatePostInput) {
