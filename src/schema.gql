@@ -2,30 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type PostReactions {
-  id_postReaction: Int!
-  id_usuario: Int!
-  id_post: Int!
-  Comentario: Boolean!
-  Like: Boolean!
-  Favorites: Boolean!
-  Share: Boolean!
-  Time_in: DateTime!
-  Time_out: DateTime
-  Post: Post!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type FilesComment {
   id_file: Int!
   id_comment: Int!
-  Dir: String!
-  File_extension: String!
-  Contenido: [Comentario!]
+  dir: String!
+  file_extension: String!
+  contenido: [Comentario!]
 }
 
 type ComentarioReactions {
@@ -37,7 +19,13 @@ type ComentarioReactions {
   share: Boolean!
   time_in: DateTime!
   comment: Comentario!
+  usuario: User!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Comentario {
   id_comentario: Int!
@@ -47,10 +35,46 @@ type Comentario {
   Fecha: DateTime!
   texto: String
   Post: Post!
+  Usuario: User!
   Padre: Comentario
   Respuestas: [Comentario!]
   files: [FilesComment!]
   reactions: [ComentarioReactions!]
+}
+
+type Follow {
+  follower_id: Int!
+  following_id: Int!
+  CreatedAt: DateTime!
+  Follower: User!
+  Following: User!
+}
+
+type User {
+  id_usuario: Int!
+  nombre_usuario: String!
+  email: String!
+  descripcion: String
+  fecha_registro: DateTime!
+  avatar: String!
+  posts: [Post!]
+  comentarios: [Comentario!]
+  siguiendo: [Follow!]
+  seguidores: [Follow!]
+}
+
+type PostReactions {
+  id_postReaction: Int!
+  id_usuario: Int!
+  id_post: Int!
+  Comentario: Boolean!
+  Like: Boolean!
+  Favorites: Boolean!
+  Share: Boolean!
+  Time_in: DateTime!
+  Time_out: DateTime
+  Post: Post!
+  Usuario: User!
 }
 
 type PostFiles {
@@ -71,13 +95,19 @@ type PostStats {
 type Post {
   id_post: Int!
   id_usuario: Int!
-  Title: String!
-  Description: String
+  title: String!
+  description: String
   fecha_publicacion: DateTime!
-  Comentarios: [Comentario!]
-  Files: [PostFiles!]
-  Reactions: [PostReactions!]
+  usuario: User!
+  comentarios: [Comentario!]
+  files: [PostFiles!]
+  reactions: [PostReactions!]
   stats: PostStats!
+}
+
+type Pet {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 type Query {
@@ -85,6 +115,9 @@ type Query {
   posts: [Post!]!
   comments: [Comentario!]!
   comment(id: Int!): Comentario!
+  users: [User!]!
+  user(id: Int!): User!
+  pet(id: Int!): Pet!
 }
 
 input SearchPostInput {
@@ -96,6 +129,12 @@ type Mutation {
   createComment(createCommentInput: CreateCommentInput!): Comentario!
   updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
   removeComment(id: Int!): Comentario!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  createPet(createPetInput: CreatePetInput!): Pet!
+  updatePet(updatePetInput: UpdatePetInput!): Pet!
+  removePet(id: Int!): Pet!
 }
 
 input CreateCommentInput {
@@ -104,6 +143,28 @@ input CreateCommentInput {
 }
 
 input UpdateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreatePetInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdatePetInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!

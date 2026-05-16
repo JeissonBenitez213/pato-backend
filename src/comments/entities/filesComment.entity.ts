@@ -10,11 +10,11 @@ export class FilesComment {
   id_comment!: number;
 
   @Field(() => String)
-  Dir!: string;
+  dir!: string;
 
   @Field(() => String)
-  File_extension!: string;
+  file_extension!: string;
 
   @Field(() => [Comentario], { nullable: true })
-  Contenido!: Comentario[];
+  contenido!: Comentario[];
 }

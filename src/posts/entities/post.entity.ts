@@ -3,6 +3,7 @@ import { PostReactions } from './postReactions.entity';
 import { Comentario } from 'src/comments/entities/comentario.entity';
 import { PostFiles } from './postFiles.entity';
 import { PostStats } from '../dto/post-stats.input';
+import { User } from 'src/users/entities/user.entity';
 
 @ObjectType()
 export class Post {
@@ -13,22 +14,25 @@ export class Post {
   id_usuario!: number;
 
   @Field(() => String)
-  Title!: string;
+  title!: string;
 
   @Field(() => String, { nullable: true })
-  Description!: string | null;
+  description!: string | null;
 
   @Field(() => GraphQLISODateTime)
   fecha_publicacion!: Date;
 
+  @Field(() => User)
+  usuario!: User;
+
   @Field(() => [Comentario], { nullable: true })
-  Comentarios!: Comentario[] | null;
+  comentarios!: Comentario[] | null;
 
   @Field(() => [PostFiles], { nullable: true })
-  Files!: PostFiles[] | null;
+  files!: PostFiles[] | null;
 
   @Field(() => [PostReactions], { nullable: true })
-  Reactions!: PostReactions[] | null;
+  reactions!: PostReactions[] | null;
 
   @Field(() => PostStats)
   stats!: PostStats;

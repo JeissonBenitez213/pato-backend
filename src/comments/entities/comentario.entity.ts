@@ -2,6 +2,7 @@ import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
 import { Post } from 'src/posts/entities/post.entity';
 import { FilesComment } from './filesComment.entity';
 import { ComentarioReactions } from './comentarioReactions.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @ObjectType()
 export class Comentario {
@@ -25,6 +26,9 @@ export class Comentario {
 
   @Field(() => Post)
   Post!: Post;
+
+  @Field(() => User)
+  Usuario!: User;
 
   @Field(() => Comentario, { nullable: true })
   Padre!: Comentario | null;

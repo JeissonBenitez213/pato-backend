@@ -1,5 +1,6 @@
 import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
 import { Comentario } from './comentario.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @ObjectType()
 export class ComentarioReactions {
@@ -26,4 +27,7 @@ export class ComentarioReactions {
 
   @Field(() => Comentario)
   comment!: Comentario;
+
+  @Field(() => User)
+  usuario!: User;
 }
