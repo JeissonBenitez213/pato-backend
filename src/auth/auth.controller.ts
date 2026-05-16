@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Login } from './dto/login.dto';
+import type { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('login')
+  async login(@Body() login: Login, @Res({ passthrough: true }) res: Response) {
+    const user = await this.authService.login(login);
+    const tokens = await this.authService.generateAuthTokens(user);
+
+    res.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: false, //poner en true para producción
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: false, //poner en true para producción
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
+    return { ok: true };
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
+  @Post('refresh')
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies?.refresh_token;
+    const user = await this.authService.validateRefreshToken(refreshToken);
+    const tokens = await this.authService.generateAuthTokens(user);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
+    res.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: false, //poner en true para producción
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 15,
+    });
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: false, //poner en true para producción
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return { ok: true };
   }
 }

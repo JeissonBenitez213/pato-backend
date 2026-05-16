@@ -1,26 +1,90 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Login } from './dto/login.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { compare } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
+
+  async login(login: Login) {
+    const user = await this.prisma.usuario.findUnique({
+      where: {
+        nombre_usuario: login.nombre_usuario,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('usuario o contraseña incorrectos');
+    }
+
+    const validate = await compare(login.contraseña, user.contraseña_hash);
+
+    if (!validate) {
+      throw new UnauthorizedException('usuario o contraseña incorrectos');
+    }
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async validateRefreshToken(token: string) {
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+
+    const payload = await this.jwtService.verify(token, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+
+    const user = await this.prisma.usuario.findUnique({
+      where: { id_usuario: payload.sub },
+    });
+
+    if (!user || !user.refresh_token) {
+      throw new UnauthorizedException();
+    }
+
+    const isValid = await compare(token, user.refresh_token);
+
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid Refresh Token');
+    }
+
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async generateAuthTokens(user: any) {
+    const payload = {
+      sub: user.id_usuario,
+      username: user.nombre_usuario,
+      isAdmin: user.is_admin,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
+
+    const hashedRefresh = await hash(refreshToken, 10);
+
+    await this.prisma.usuario.update({
+      where: { id_usuario: user.id_usuario },
+      data: { refresh_token: hashedRefresh },
+    });
+
+    return { accessToken, refreshToken };
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+  async register() {}
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+  async logout() {}
 }
