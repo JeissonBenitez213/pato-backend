@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { StringValue } from 'ms';
+import { JwtStrategy } from './strateggies/jwt.strateggy';
 
 @Module({
   controllers: [AuthController],
@@ -15,6 +16,7 @@ import { StringValue } from 'ms';
         expiresIn: process.env.JWT_EXPIRES_IN as StringValue,
       },
     }),
+    JwtStrategy,
   ],
 })
 export class AuthModule {}

@@ -7,6 +7,7 @@ import { hash } from 'bcrypt';
 import { LoginAuth } from './dto/loginAuth.dto';
 import { Register } from './dto/register.dto';
 import { RegisterAuth } from './dto/registerAuth.dto';
+import { CreatePostInput } from 'src/posts/dto/create-post.input';
 
 @Injectable()
 export class AuthService {

@@ -1,16 +1,29 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber } from 'class-validator';
-import { AddFile } from './add-file.input';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { FileInput } from './file-post.input';
 
 @InputType()
 export class CreatePostInput {
-  @IsNumber()
   @IsNotEmpty()
-  @Field(() => Int)
-  id_usuario!: number;
+  @IsString()
+  @MinLength(5)
+  @Field(() => String)
+  title!: string;
 
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  description?: string;
+
+  @IsOptional()
   @IsArray()
-  @ArrayNotEmpty()
-  @Field(() => [AddFile], { nullable: true })
-  contenido!: AddFile[];
+  @Field(() => [FileInput], { nullable: true })
+  files?: FileInput[];
 }

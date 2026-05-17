@@ -13,6 +13,7 @@ import { PetModule } from './pet/pet.module';
 import { MessagesModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
 import { BadgesModule } from './badges/badges.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BadgesModule } from './badges/badges.module';
     MessagesModule,
     AuthModule,
     BadgesModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
