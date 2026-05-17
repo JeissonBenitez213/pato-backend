@@ -10,6 +10,8 @@ import { AuthService } from './auth.service';
 import { Login } from './dto/login.dto';
 import type { Request, Response } from 'express';
 import { LoginAuth } from './dto/loginAuth.dto';
+import { Register } from './dto/register.dto';
+import { RegisterAuth } from './dto/registerAuth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -100,5 +102,15 @@ export class AuthController {
     }
 
     throw new UnauthorizedException('no hay ninguna sesión iniciada');
+  }
+
+  @Post('register')
+  async register(@Body() data: Register) {
+    return await this.authService.regiser(data);
+  }
+
+  @Post('registerAuth')
+  async registerAuth(@Body() data: RegisterAuth) {
+    return await this.authService.registerAuth(data);
   }
 }

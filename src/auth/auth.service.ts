@@ -5,6 +5,8 @@ import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'bcrypt';
 import { LoginAuth } from './dto/loginAuth.dto';
+import { Register } from './dto/register.dto';
+import { RegisterAuth } from './dto/registerAuth.dto';
 
 @Injectable()
 export class AuthService {
@@ -107,6 +109,39 @@ export class AuthService {
     }
 
     return user.user;
+  }
+
+  async regiser(data: Register) {
+    if (data.contraseña != data.contraseña_repetida) {
+      throw new UnauthorizedException('usuario o contraseña incorrectas');
+    }
+
+    const hashed_password = await hash(data.contraseña, 10);
+
+    const newUser = await this.prisma.usuario.create({
+      data: {
+        nombre_usuario: data.nombre_usuario,
+        contraseña_hash: hashed_password,
+      },
+    });
+
+    return newUser;
+  }
+
+  async registerAuth(data: RegisterAuth) {
+    const newUser = await this.prisma.usuario.create({
+      data: {
+        nombre_usuario: data.username,
+        auths: {
+          create: {
+            provider: data.provider,
+            provider_id: data.provider_id,
+          },
+        },
+      },
+    });
+
+    return newUser;
   }
 
   async logout(refreshToken: string) {

@@ -17,10 +17,10 @@ datasource db {
 model Usuario {
   id_usuario        Int       @id @default(autoincrement())
   nombre_usuario    String    @unique
-  email             String    @unique
+  email             String?   @unique
   descripcion       String?
   contraseña_hash   String?
-  fecha_registro    DateTime
+  fecha_registro    DateTime @default(now())
   bio               String?
   refresh_token     String?
   avatar            String  @default("https://placehold.co/300x300?text=Avatar")
