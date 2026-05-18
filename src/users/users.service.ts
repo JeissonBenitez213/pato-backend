@@ -37,4 +37,51 @@ export class UsersService {
 
     return user;
   }
+
+  async toggleFollow(id_user: number, id_user_to_follow: number, select: any) {
+    const validateUser = await this.prisma.follow.findUnique({
+      where: {
+        follower_id_following_id: {
+          follower_id: id_user,
+          following_id: id_user_to_follow,
+        },
+      },
+    });
+
+    if (!validateUser) {
+      const follow = await this.prisma.follow.create({
+        data: {
+          follower_id: id_user,
+          following_id: id_user_to_follow,
+        },
+
+        select: {
+          following: select.select,
+        },
+      });
+
+      return {
+        user: follow.following,
+        following: true,
+      };
+    }
+
+    const follow = await this.prisma.follow.delete({
+      where: {
+        follower_id_following_id: {
+          follower_id: id_user,
+          following_id: id_user_to_follow,
+        },
+      },
+
+      select: {
+        following: select.select,
+      },
+    });
+
+    return {
+      user: follow.following,
+      following: false,
+    };
+  }
 }

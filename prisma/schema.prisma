@@ -104,6 +104,8 @@ model PostReactions {
 
   post    Post    @relation(fields: [id_post], references: [id_post], onDelete: Cascade)
   usuario Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@unique([id_usuario, id_post])
 }
 
 model Files_Post {

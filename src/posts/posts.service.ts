@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SearchPostInput } from './dto/search-post.input';
 import { DeletePost } from './dto/delete-post.input';
 import { unlink } from 'fs/promises';
+import { AddReaction } from './dto/add-reaction.input';
 
 @Injectable()
 export class PostsService {
@@ -265,11 +266,58 @@ export class PostsService {
     });
   }
 
-  update(id: number, updatePostInput: UpdatePostInput) {
-    return `This action updates a #${id} post`;
+  async updateReaction(input: UpdatePostInput, user_id: number, select: any) {
+    const validate = await this.prisma.post.findFirst({
+      where: {
+        AND: [{ id_post: input.id_post }, { id_usuario: user_id }],
+      },
+    });
+
+    if (!validate) {
+      throw new UnauthorizedException('no eres el dueño del post');
+    }
+
+    const updatePost = await this.prisma.post.update({
+      where: {
+        id_post: input.id_post,
+      },
+      data: {
+        title: input.title,
+        description: input.description,
+      },
+    });
+
+    return updatePost;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async addReaction(input: AddReaction, select: any, id_usuario: number) {
+    const { id_post, ...reactions } = input;
+
+    const filteredReactions = Object.fromEntries(
+      Object.entries(reactions).filter(([_, value]) => value !== undefined),
+    );
+
+    const reaction = await this.prisma.postReactions.upsert({
+      where: {
+        id_usuario_id_post: {
+          id_usuario,
+          id_post,
+        },
+      },
+
+      update: {
+        ...filteredReactions,
+      },
+
+      create: {
+        id_post,
+        id_usuario,
+        ...filteredReactions,
+      },
+
+      ...select,
+    });
+
+    return reaction;
   }
 }
