@@ -1,31 +1,29 @@
-import {
-  Args,
-  Context,
-  Mutation,
-  Resolver,
-  Subscription,
-} from '@nestjs/graphql';
-import { Message } from './entities/message.entity';
-import { Query } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+
 import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from 'src/auth/guards/guards.guard';
-import { MessagesService } from './messages.service';
-import { SearchMessageDto } from './dto/search_message.dto';
 import { PubSub } from 'graphql-subscriptions';
+
+import { GqlAuthGuard } from 'src/auth/guards/guards.guard';
+
+import { MessagesService } from './messages.service';
+
+import { Message } from './entities/message.entity';
+
+import { SearchMessageDto } from './dto/search_message.dto';
 import { CreateMessage } from './dto/create_message.dto';
 import { DeleteMessage } from './dto/delete_message.dto';
 import { UpdateMessage } from './dto/update_message.dto';
 
 const pubSub = new PubSub();
 
-@Resolver()
+@Resolver(() => Message)
 export class MessagesResolver {
-  constructor(private messagesService: MessagesService) {}
+  constructor(private readonly messagesService: MessagesService) {}
 
-  @Query(() => Message)
+  @Query(() => [Message])
   @UseGuards(GqlAuthGuard)
   async getMessages(@Args('input') input: SearchMessageDto) {
-    return await this.messagesService.getMessages(
+    return this.messagesService.getMessages(
       input.id_usuario_envia,
       input.id_usuario_recibe,
     );
@@ -49,7 +47,7 @@ export class MessagesResolver {
     const message = await this.messagesService.deleteMessage(input);
 
     await pubSub.publish('DELETE_MESSAGE', {
-      deleted_message: Message,
+      deleteMessage: message,
     });
 
     return message;
@@ -61,7 +59,7 @@ export class MessagesResolver {
     const message = await this.messagesService.updateMessage(input);
 
     await pubSub.publish('UPDATE_MESSAGE', {
-      updated_message: Message,
+      updatedMessage: message,
     });
 
     return message;
