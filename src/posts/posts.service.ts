@@ -87,12 +87,10 @@ export class PostsService {
     const limit = select.take ?? 10;
     const cursor = select.cursor;
 
-    // 1. sets de señales del usuario
     const likedPosts = new Set<number>();
     const favoritePosts = new Set<number>();
     const sharedPosts = new Set<number>();
 
-    // 2. cargar usuario SOLO si está loggeado
     if (userId) {
       const reactions = await this.prisma.postReactions.findMany({
         where: {
@@ -106,7 +104,6 @@ export class PostsService {
         },
       });
 
-      // 3. construir sets rápidos
       for (const r of reactions) {
         if (r.like) likedPosts.add(r.id_post);
         if (r.favorites) favoritePosts.add(r.id_post);
@@ -114,7 +111,6 @@ export class PostsService {
       }
     }
 
-    // 4. traer posts base (sin filtros agresivos)
     const posts = await this.prisma.post.findMany({
       take: limit,
       skip: cursor ? 1 : 0,
@@ -131,7 +127,6 @@ export class PostsService {
       },
     });
 
-    // 5. SI ES GUEST → return directo
     if (!userId) {
       return {
         data: posts,
@@ -139,18 +134,15 @@ export class PostsService {
       };
     }
 
-    // 6. SCORING SYSTEM (USER FEED)
     const ranked = posts.map((post) => {
       let score = 0;
 
       const reactionCount = post.reactions?.length ?? 0;
       const commentCount = post.comentarios?.length ?? 0;
 
-      // 🔥 popularidad global
       score += reactionCount * 1;
       score += commentCount * 2;
 
-      // 🔥 interés del usuario (IMPORTANTE)
       if (likedPosts.has(post.id_post)) {
         score += 5;
       }
@@ -163,7 +155,6 @@ export class PostsService {
         score += 15;
       }
 
-      // 🔥 recencia
       const ageHours =
         (Date.now() - new Date(post.fecha_publicacion).getTime()) /
         (1000 * 60 * 60);
@@ -176,7 +167,6 @@ export class PostsService {
       };
     });
 
-    // 7. ordenar por relevancia
     ranked.sort((a, b) => b.score - a.score);
 
     const paginated = ranked.slice(0, limit);
