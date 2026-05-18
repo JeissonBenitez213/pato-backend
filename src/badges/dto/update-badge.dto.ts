@@ -1,6 +1,25 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBadgeDto } from './create-badge.dto';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class UpdateBadgeDto extends PartialType(CreateBadgeDto) {
-  id: number;
+@ObjectType()
+export class UpdateBadge {
+  @IsNotEmpty()
+  @IsNumber()
+  @Field(() => Int)
+  id_insignia!: number;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  nombre?: string;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  icono?: string;
 }
