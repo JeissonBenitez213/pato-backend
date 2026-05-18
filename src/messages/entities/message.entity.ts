@@ -13,6 +13,12 @@ export class Message {
   @Field(() => Int)
   id_usuario_recibe!: number;
 
+  @Field(() => String)
+  texto!: string;
+
+  @Field(() => Boolean)
+  editado!: boolean;
+
   @Field(() => GraphQLISODateTime)
   fecha!: Date;
 

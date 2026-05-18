@@ -2,24 +2,79 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type FilesComment {
-  id_file: Int!
-  id_comment: Int!
+input AddFilesMessage {
   dir: String!
-  file_extension: String!
-  contenido: [Comentario!]
+  fie_extension: String!
+  id_mensaje: Int!
+}
+
+type Badge {
+  descripcion: String
+  icono: String
+  id_insignia: Int!
+  nombre: String!
+}
+
+type BadgesUsers {
+  fecha_otorgada: DateTime!
+  id_insignia: Int!
+  id_usuario: Int!
+  insignia: Badge!
+}
+
+type Comentario {
+  Fecha: DateTime!
+  Padre: Comentario
+  Post: Post!
+  Respuestas: [Comentario!]
+  Usuario: User!
+  files: [FilesComment!]
+  id_comentario: Int!
+  id_comentario_padre: Int
+  id_post: Int!
+  id_usuario: Int!
+  reactions: [ComentarioReactions!]
+  texto: String
 }
 
 type ComentarioReactions {
+  comment: Comentario!
+  commented: Boolean!
+  id_comment: Int!
   id_reaction: Int!
   id_usuario: Int!
-  id_comment: Int!
-  commented: Boolean!
   like: Boolean!
   share: Boolean!
   time_in: DateTime!
-  comment: Comentario!
   usuario: User!
+}
+
+input CreateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateMessage {
+  files: [AddFilesMessage!]
+  id_usuario_envia: Int!
+  id_usuario_recibe: Int!
+  texto: String!
+}
+
+input CreatePetInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreatePostInput {
+  description: String
+  files: [FileInput!]
+  title: String!
+}
+
+input CreateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 """
@@ -27,116 +82,136 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Comentario {
-  id_comentario: Int!
+input DeleteMessage {
+  id_mensaje: Int!
+}
+
+input DeletePost {
   id_post: Int!
-  id_usuario: Int!
-  id_comentario_padre: Int
-  Fecha: DateTime!
-  texto: String
-  Post: Post!
-  Usuario: User!
-  Padre: Comentario
-  Respuestas: [Comentario!]
-  files: [FilesComment!]
-  reactions: [ComentarioReactions!]
+}
+
+input FileInput {
+  dir: String!
+  file_extension: String!
+}
+
+type FilesComment {
+  contenido: [Comentario!]
+  dir: String!
+  file_extension: String!
+  id_comment: Int!
+  id_file: Int!
+}
+
+type FilesMessage {
+  dir: String!
+  fie_extension: String!
+  id_file: Int!
+  id_mensaje: Int!
 }
 
 type Follow {
-  follower_id: Int!
-  following_id: Int!
   CreatedAt: DateTime!
   Follower: User!
   Following: User!
+  follower_id: Int!
+  following_id: Int!
 }
 
-type Badge {
-  id_insignia: Int!
-  nombre: String!
-  descripcion: String
-  icono: String
+type Message {
+  editado: Boolean!
+  envia: User!
+  fecha: DateTime!
+  files: [FilesMessage!]
+  id_mensaje: Int!
+  id_usuario_envia: Int!
+  id_usuario_recibe: Int!
+  leido: Boolean!
+  recibe: User!
+  texto: String!
 }
 
-type BadgesUsers {
-  id_usuario: Int!
-  id_insignia: Int!
-  fecha_otorgada: DateTime!
-  insignia: Badge!
-}
-
-type User {
-  id_usuario: Int!
-  nombre_usuario: String!
-  email: String!
-  descripcion: String
-  fecha_registro: DateTime!
-  avatar: String!
-  is_admin: Boolean!
-  posts: [Post!]
-  comentarios: [Comentario!]
-  siguiendo: [Follow!]
-  seguidores: [Follow!]
-  insignias: [BadgesUsers!]
-}
-
-type PostReactions {
-  id_postReaction: Int!
-  id_usuario: Int!
-  id_post: Int!
-  Comentario: Boolean!
-  Like: Boolean!
-  Favorites: Boolean!
-  Share: Boolean!
-  Time_in: DateTime!
-  Time_out: DateTime
-  Post: Post!
-  Usuario: User!
-}
-
-type PostFiles {
-  id_file: Int!
-  id_post: Int!
-  dir: String!
-  file_extension: String!
-  post: Post!
-}
-
-type PostStats {
-  comentarios: Int!
-  likes: Int!
-  favorites: Int!
-  shares: Int!
-}
-
-type Post {
-  id_post: Int!
-  id_usuario: Int!
-  title: String!
-  description: String
-  fecha_publicacion: DateTime!
-  usuario: User!
-  comentarios: [Comentario!]
-  files: [PostFiles!]
-  reactions: [PostReactions!]
-  stats: PostStats!
+type Mutation {
+  createComment(createCommentInput: CreateCommentInput!): Comentario!
+  createMessage(input: CreateMessage!): Message!
+  createPet(createPetInput: CreatePetInput!): Pet!
+  createPost(input: CreatePostInput!): Post!
+  createUser(createUserInput: CreateUserInput!): User!
+  deletePost(post: DeletePost!): Post!
+  removeComment(id: Int!): Comentario!
+  removeMessage(input: DeleteMessage!): Message!
+  removePet(id: Int!): Pet!
+  removeUser(id: Int!): User!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
+  updateMessage(input: UpdateMessage!): Message!
+  updatePet(updatePetInput: UpdatePetInput!): Pet!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Pet {
+  fecha_ultima_evolucion: DateTime!
   id_mascota: Int!
   id_usuario: Int!
   nivel_actual: Int!
   puntos_experiencia: Int!
-  fecha_ultima_evolucion: DateTime!
+}
+
+type Post {
+  comentarios: [Comentario!]
+  description: String
+  fecha_publicacion: DateTime!
+  files: [PostFiles!]
+  id_post: Int!
+  id_usuario: Int!
+  reactions: [PostReactions!]
+  stats: PostStats!
+  title: String!
+  usuario: User!
+}
+
+type PostFiles {
+  dir: String!
+  file_extension: String!
+  id_file: Int!
+  id_post: Int!
+  post: Post!
+}
+
+type PostReactions {
+  Comentario: Boolean!
+  Favorites: Boolean!
+  Like: Boolean!
+  Post: Post!
+  Share: Boolean!
+  Time_in: DateTime!
+  Time_out: DateTime
+  Usuario: User!
+  id_post: Int!
+  id_postReaction: Int!
+  id_usuario: Int!
+}
+
+type PostStats {
+  comentarios: Int!
+  favorites: Int!
+  likes: Int!
+  shares: Int!
 }
 
 type Query {
-  searchPosts(filter: SearchPostInput!): [Post!]!
-  posts: [Post!]!
-  comments: [Comentario!]!
   comment(id: Int!): Comentario!
-  users: [User!]!
-  user(id: Int!): User!
+  comments: [Comentario!]!
+  getMessages(input: SearchMessageDto!): Message!
   pet(id: Int!): Pet!
+  posts: [Post!]!
+  searchPosts(filter: SearchPostInput!): [Post!]!
+  user(id: Int!): User!
+  users: [User!]!
+}
+
+input SearchMessageDto {
+  id_usuario_envia: Int!
+  id_usuario_recibe: Int!
 }
 
 input SearchPostInput {
@@ -144,21 +219,10 @@ input SearchPostInput {
   username: String
 }
 
-type Mutation {
-  createComment(createCommentInput: CreateCommentInput!): Comentario!
-  updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
-  removeComment(id: Int!): Comentario!
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
-  createPet(createPetInput: CreatePetInput!): Pet!
-  updatePet(updatePetInput: UpdatePetInput!): Pet!
-  removePet(id: Int!): Pet!
-}
-
-input CreateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+type Subscription {
+  deleteMessage: Message!
+  newMessage: Message!
+  updatedMessage: Message!
 }
 
 input UpdateCommentInput {
@@ -167,9 +231,15 @@ input UpdateCommentInput {
   id: Int!
 }
 
-input CreateUserInput {
+input UpdateMessage {
+  id_mensaje: Int!
+  texto: String!
+}
+
+input UpdatePetInput {
   """Example field (placeholder)"""
-  exampleField: Int!
+  exampleField: Int
+  id: Int!
 }
 
 input UpdateUserInput {
@@ -178,13 +248,17 @@ input UpdateUserInput {
   id: Int!
 }
 
-input CreatePetInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdatePetInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+type User {
+  avatar: String!
+  comentarios: [Comentario!]
+  descripcion: String
+  email: String!
+  fecha_registro: DateTime!
+  id_usuario: Int!
+  insignias: [BadgesUsers!]
+  is_admin: Boolean!
+  nombre_usuario: String!
+  posts: [Post!]
+  seguidores: [Follow!]
+  siguiendo: [Follow!]
 }

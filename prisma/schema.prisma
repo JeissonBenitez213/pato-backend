@@ -165,8 +165,9 @@ model Mensaje {
   id_usuario_envia   Int
   id_usuario_recibe  Int
   texto              String
-  fecha              DateTime
+  fecha              DateTime @default(now())
   leido              Boolean  @default(false)
+  editado            Boolean  @default(false)
 
   envia   Usuario @relation("MensajesEnviados", fields: [id_usuario_envia], references: [id_usuario])
   recibe  Usuario @relation("MensajesRecibidos", fields: [id_usuario_recibe], references: [id_usuario])
