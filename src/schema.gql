@@ -72,11 +72,6 @@ input CreatePostInput {
   title: String!
 }
 
-input CreateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -136,16 +131,13 @@ type Mutation {
   createMessage(input: CreateMessage!): Message!
   createPet(createPetInput: CreatePetInput!): Pet!
   createPost(input: CreatePostInput!): Post!
-  createUser(createUserInput: CreateUserInput!): User!
   deletePost(post: DeletePost!): Post!
   removeComment(id: Int!): Comentario!
   removeMessage(input: DeleteMessage!): Message!
   removePet(id: Int!): Pet!
-  removeUser(id: Int!): User!
   updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
   updateMessage(input: UpdateMessage!): Message!
   updatePet(updatePetInput: UpdatePetInput!): Pet!
-  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Pet {
@@ -201,12 +193,12 @@ type PostStats {
 type Query {
   comment(id: Int!): Comentario!
   comments: [Comentario!]!
-  getMessages(input: SearchMessageDto!): Message!
+  findFriends: [User!]!
+  findOneUser(id_user: Float!): User!
+  getMessages(input: SearchMessageDto!): [Message!]!
   pet(id: Int!): Pet!
   posts: [Post!]!
   searchPosts(filter: SearchPostInput!): [Post!]!
-  user(id: Int!): User!
-  users: [User!]!
 }
 
 input SearchMessageDto {
@@ -237,12 +229,6 @@ input UpdateMessage {
 }
 
 input UpdatePetInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
-input UpdateUserInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
