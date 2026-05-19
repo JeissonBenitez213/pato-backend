@@ -160,7 +160,6 @@ type Mutation {
   createBadge(input: CreateBadgeDto!): Badge!
   createComment(input: CreateCommentInput!): Comentario!
   createMessage(input: CreateMessage!): Message!
-  createPet: Pet!
   createPost(input: CreatePostInput!): Post!
   deleteComment(comment_id: Float!): Comentario!
   deletePost(post: DeletePost!): Post!
@@ -169,7 +168,6 @@ type Mutation {
   toggleFollow(id_user: Float!): FollowResponse!
   updateBadge(input: UpdateBadge!): Badge!
   updateMessage(input: UpdateMessage!): Message!
-  updatePet(input: UpdatePetInput!): Pet!
   updatePost(input: UpdatePostInput!): Post!
 }
 
@@ -263,10 +261,6 @@ input UpdateBadge {
 input UpdateMessage {
   id_mensaje: Int!
   texto: String!
-}
-
-input UpdatePetInput {
-  puntos_experiencia: Int!
 }
 
 input UpdatePostInput {

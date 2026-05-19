@@ -21,7 +21,7 @@ export class PetListener {
       where: {
         id_usuario: payload.userId,
 
-        fecha_creacion: {
+        fecha_publicacion: {
           gte: today,
         },
       },
@@ -52,7 +52,7 @@ export class PetListener {
       where: {
         id_usuario: payload.userId,
 
-        fecha_creacion: {
+        fecha: {
           gte: today,
         },
       },
