@@ -1,8 +1,10 @@
-import { CreatePetInput } from './create-pet.input';
-import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 @InputType()
-export class UpdatePetInput extends PartialType(CreatePetInput) {
+export class UpdatePetInput {
+  @IsNumber()
+  @IsNotEmpty()
   @Field(() => Int)
-  id: number;
+  puntos_experiencia!: number;
 }
