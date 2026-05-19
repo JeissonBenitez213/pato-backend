@@ -10,13 +10,18 @@ import { SearchPostInput } from './dto/search-post.input';
 import { DeletePost } from './dto/delete-post.input';
 import { unlink } from 'fs/promises';
 import { AddReaction } from './dto/add-reaction.input';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   async create(post: CreatePostInput, userId: number) {
     const { files, ...rest } = post;
+
     const newPost = await this.prisma.post.create({
       data: {
         ...rest,
@@ -29,13 +34,28 @@ export class PostsService {
               })),
             }
           : undefined,
+
         id_usuario: userId,
       },
     });
 
-    if (!files) {
-      return newPost;
+    let xp = 35;
+
+    if (files?.length) {
+      xp += 10;
     }
+
+    if (files && files.length >= 4) {
+      xp += 10;
+    }
+
+    this.eventEmitter.emit('post.created', {
+      userId,
+      postId: newPost.id_post,
+      xp,
+    });
+
+    return newPost;
   }
 
   async delete(post: DeletePost, user_id: number) {

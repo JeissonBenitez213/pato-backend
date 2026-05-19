@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddFiles {
+  dir: String!
+  file_extension: String!
+}
+
 input AddFilesMessage {
   dir: String!
   fie_extension: String!
@@ -14,6 +19,14 @@ input AddReaction {
   id_post: Int!
   like: Boolean
   shares: Boolean
+}
+
+input AddReactions {
+  commented: Boolean!
+  id_comment: Int!
+  id_usuario: Int!
+  like: Boolean!
+  share: Boolean!
 }
 
 type Badge {
@@ -63,8 +76,10 @@ input CreateBadgeDto {
 }
 
 input CreateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  files: [AddFiles!]
+  id_comentario_padre: Int
+  id_post: Int!
+  texto: String!
 }
 
 input CreateMessage {
@@ -72,11 +87,6 @@ input CreateMessage {
   id_usuario_envia: Int!
   id_usuario_recibe: Int!
   texto: String!
-}
-
-input CreatePetInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
 }
 
 input CreatePostInput {
@@ -146,21 +156,20 @@ type Message {
 
 type Mutation {
   addReaction(input: AddReaction!): PostReactions!
+  addReactions(input: AddReactions!): ComentarioReactions!
   createBadge(input: CreateBadgeDto!): Badge!
-  createComment(createCommentInput: CreateCommentInput!): Comentario!
+  createComment(input: CreateCommentInput!): Comentario!
   createMessage(input: CreateMessage!): Message!
-  createPet(createPetInput: CreatePetInput!): Pet!
+  createPet: Pet!
   createPost(input: CreatePostInput!): Post!
+  deleteComment(comment_id: Float!): Comentario!
   deletePost(post: DeletePost!): Post!
   deleteRole(id: Float!): Badge!
-  removeComment(id: Int!): Comentario!
   removeMessage(input: DeleteMessage!): Message!
-  removePet(id: Int!): Pet!
   toggleFollow(id_user: Float!): FollowResponse!
   updateBadge(input: UpdateBadge!): Badge!
-  updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
   updateMessage(input: UpdateMessage!): Message!
-  updatePet(updatePetInput: UpdatePetInput!): Pet!
+  updatePet(input: UpdatePetInput!): Pet!
   updatePost(input: UpdatePostInput!): Post!
 }
 
@@ -215,13 +224,13 @@ type PostStats {
 }
 
 type Query {
-  comment(id: Int!): Comentario!
-  comments: [Comentario!]!
   findFriends: [User!]!
   findOneUser(id_user: Float!): User!
   getBadges: [Badge!]!
+  getComment: [Comentario!]!
+  getCommentsByParent(comment_id: Float!): [Comentario!]!
   getMessages(input: SearchMessageDto!): [Message!]!
-  pet(id: Int!): Pet!
+  getPet: Pet!
   posts: [Post!]!
   searchPosts(filter: SearchPostInput!): [Post!]!
 }
@@ -251,21 +260,13 @@ input UpdateBadge {
   nombre: String
 }
 
-input UpdateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
 input UpdateMessage {
   id_mensaje: Int!
   texto: String!
 }
 
 input UpdatePetInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  puntos_experiencia: Int!
 }
 
 input UpdatePostInput {

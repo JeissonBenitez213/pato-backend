@@ -3,7 +3,6 @@ import {
   Query,
   Mutation,
   Args,
-  Int,
   Context,
   Info,
 } from '@nestjs/graphql';
@@ -18,14 +17,6 @@ import { UpdatePetInput } from './dto/update-pet.input';
 @Resolver(() => Pet)
 export class PetResolver {
   constructor(private readonly petService: PetService) {}
-
-  @Mutation(() => Pet)
-  @UseGuards(GqlAuthGuard)
-  async createPet(@Context() ctx: any, @Info() info: GraphQLResolveInfo) {
-    const select = new PrismaSelect(info);
-    const userId = ctx.req.user?.id;
-    return await this.petService.create(userId, select);
-  }
 
   @Query(() => Pet)
   @UseGuards(GqlAuthGuard)

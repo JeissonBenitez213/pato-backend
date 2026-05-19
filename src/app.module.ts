@@ -14,6 +14,7 @@ import { MessagesModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
 import { BadgesModule } from './badges/badges.module';
 import { FilesModule } from './files/files.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { FilesModule } from './files/files.module';
         'graphql-ws': true,
       },
     }),
+    EventEmitterModule.forRoot(),
     CommentsModule,
     UsersModule,
     PetModule,

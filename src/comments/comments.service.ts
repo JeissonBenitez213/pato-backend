@@ -7,10 +7,14 @@ import { CreateCommentInput } from './dto/create-comment.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddReactions } from './dto/add-reactions.input';
 import { UpdateCommentInput } from './dto/update-comment.input';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CommentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   async getComments(select: any) {
     return await this.prisma.comentario.findMany({
@@ -47,6 +51,11 @@ export class CommentsService {
           : undefined,
       },
       ...select,
+    });
+
+    this.eventEmitter.emit('comment.created', {
+      userId,
+      xp: 15,
     });
 
     return newComment;
