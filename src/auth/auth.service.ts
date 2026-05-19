@@ -7,13 +7,14 @@ import { hash } from 'bcrypt';
 import { LoginAuth } from './dto/loginAuth.dto';
 import { Register } from './dto/register.dto';
 import { RegisterAuth } from './dto/registerAuth.dto';
-import { CreatePostInput } from 'src/posts/dto/create-post.input';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async login(login: Login) {
@@ -126,6 +127,10 @@ export class AuthService {
       },
     });
 
+    this.eventEmitter.emit('user.registered', {
+      userId: newUser.id_usuario,
+    });
+
     return newUser;
   }
 
@@ -140,6 +145,10 @@ export class AuthService {
           },
         },
       },
+    });
+
+    this.eventEmitter.emit('user.registered', {
+      userId: newUser.id_usuario,
     });
 
     return newUser;

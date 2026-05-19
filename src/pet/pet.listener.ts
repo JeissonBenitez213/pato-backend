@@ -72,4 +72,9 @@ export class PetListener {
       },
     );
   }
+
+  @OnEvent('user.registered')
+  async handleUserRegistered(payload: { userId: number }) {
+    await this.petService.create(payload.userId, {});
+  }
 }
