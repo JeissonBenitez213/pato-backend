@@ -146,11 +146,9 @@ model ComentarioReactions {
   like      Boolean @default(false)
   share     Boolean @default(false)
 
-  time_in  DateTime @default(now())
-  time_out DateTime?
-
   comment Comentario @relation(fields: [id_comment], references: [id_comentario], onDelete: Cascade)
   usuario Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  @@unique([id_comment,id_usuario])
 }
 
 model Files_Comment {

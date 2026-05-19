@@ -32,9 +32,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
       select: {
         id_usuario: true,
-        username: true,
-        isAdmin: true,
-        banned: true,
+        nombre_usuario: true,
+        is_admin: true,
       },
     });
 
@@ -42,14 +41,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User not found');
     }
 
-    if (user.banned) {
-      throw new ForbiddenException('User banned');
-    }
-
     return {
       id: user.id_usuario,
-      username: user.username,
-      isAdmin: user.isAdmin,
+      username: user.nombre_usuario,
+      isAdmin: user.is_admin,
     };
   }
 }

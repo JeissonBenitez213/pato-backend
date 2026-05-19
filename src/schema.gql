@@ -8,6 +8,14 @@ input AddFilesMessage {
   id_mensaje: Int!
 }
 
+input AddReaction {
+  comentario: Boolean
+  favorites: Boolean
+  id_post: Int!
+  like: Boolean
+  shares: Boolean
+}
+
 type Badge {
   descripcion: String
   icono: String
@@ -45,8 +53,13 @@ type ComentarioReactions {
   id_usuario: Int!
   like: Boolean!
   share: Boolean!
-  time_in: DateTime!
   usuario: User!
+}
+
+input CreateBadgeDto {
+  descripcion: String
+  icono: String
+  nombre: String!
 }
 
 input CreateCommentInput {
@@ -113,6 +126,11 @@ type Follow {
   following_id: Int!
 }
 
+type FollowResponse {
+  following: Boolean!
+  user: User!
+}
+
 type Message {
   editado: Boolean!
   envia: User!
@@ -127,17 +145,23 @@ type Message {
 }
 
 type Mutation {
+  addReaction(input: AddReaction!): PostReactions!
+  createBadge(input: CreateBadgeDto!): Badge!
   createComment(createCommentInput: CreateCommentInput!): Comentario!
   createMessage(input: CreateMessage!): Message!
   createPet(createPetInput: CreatePetInput!): Pet!
   createPost(input: CreatePostInput!): Post!
   deletePost(post: DeletePost!): Post!
+  deleteRole(id: Float!): Badge!
   removeComment(id: Int!): Comentario!
   removeMessage(input: DeleteMessage!): Message!
   removePet(id: Int!): Pet!
+  toggleFollow(id_user: Float!): FollowResponse!
+  updateBadge(input: UpdateBadge!): Badge!
   updateComment(updateCommentInput: UpdateCommentInput!): Comentario!
   updateMessage(input: UpdateMessage!): Message!
   updatePet(updatePetInput: UpdatePetInput!): Pet!
+  updatePost(input: UpdatePostInput!): Post!
 }
 
 type Pet {
@@ -195,6 +219,7 @@ type Query {
   comments: [Comentario!]!
   findFriends: [User!]!
   findOneUser(id_user: Float!): User!
+  getBadges: [Badge!]!
   getMessages(input: SearchMessageDto!): [Message!]!
   pet(id: Int!): Pet!
   posts: [Post!]!
@@ -212,9 +237,18 @@ input SearchPostInput {
 }
 
 type Subscription {
+  addedReaction: PostReactions!
   deleteMessage: Message!
   newMessage: Message!
+  toogledFollow: FollowResponse!
   updatedMessage: Message!
+}
+
+input UpdateBadge {
+  description: String
+  icono: String
+  id_insignia: Int!
+  nombre: String
 }
 
 input UpdateCommentInput {
@@ -232,6 +266,13 @@ input UpdatePetInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
+}
+
+input UpdatePostInput {
+  description: String!
+  files: [FileInput!]
+  id_post: Int!
+  title: String!
 }
 
 type User {

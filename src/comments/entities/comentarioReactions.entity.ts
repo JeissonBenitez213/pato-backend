@@ -22,9 +22,6 @@ export class ComentarioReactions {
   @Field(() => Boolean)
   share!: boolean;
 
-  @Field(() => GraphQLISODateTime)
-  time_in!: Date;
-
   @Field(() => Comentario)
   comment!: Comentario;
 

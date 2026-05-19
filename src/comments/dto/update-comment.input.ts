@@ -1,8 +1,15 @@
-import { CreateCommentInput } from './create-comment.input';
-import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 @InputType()
-export class UpdateCommentInput extends PartialType(CreateCommentInput) {
+export class UpdateCommentInput {
+  @IsNotEmpty()
+  @IsNumber()
   @Field(() => Int)
-  id: number;
+  id_comentario!: number;
+
+  @IsNotEmpty()
+  @IsString()
+  @Field(() => String)
+  texto!: string;
 }

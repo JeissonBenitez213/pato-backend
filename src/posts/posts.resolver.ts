@@ -114,8 +114,8 @@ export class PostsResolver {
     return updatePost;
   }
 
-  @Subscription()
+  @Subscription(() => PostReactions)
   async addedReaction() {
-    return pubSub.asyncIterableIterator('USER_REACTIOn');
+    return pubSub.asyncIterableIterator('USER_REACTION');
   }
 }
