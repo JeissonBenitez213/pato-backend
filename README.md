@@ -1,98 +1,181 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Pato Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API backend para la aplicacion Pato. Esta construido con NestJS, GraphQL, Apollo, Prisma y SQLite.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Descripcion
 
-## Description
+Este backend ofrece:
+- Autenticacion JWT con access token y refresh token en cookies.
+- Registro y login de usuarios normales y OAuth.
+- Gestion de publicaciones, comentarios, reacciones y archivos.
+- Mensajeria privada entre usuarios.
+- Seguimiento de usuarios (follow/unfollow).
+- Mascota vinculada a cada usuario.
+- Insignias administrables con permisos de administrador.
+- GraphQL con suscripciones en tiempo real.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Estructura principal
 
-## Project setup
+Modulos principales:
+- `AuthModule`: login, refresh, logout, registro y OAuth.
+- `UsersModule`: perfiles, lista de amigos y follow/unfollow.
+- `PostsModule`: feed, busqueda, creacion, edicion, eliminacion y reacciones.
+- `CommentsModule`: comentarios anidados, reacciones y actualizacion.
+- `MessagesModule`: mensajes directos con suscripciones.
+- `BadgesModule`: creacion / edicion / eliminacion de insignias (admin).
+- `PetModule`: estado de mascota del usuario.
+- `FilesModule`: subida de archivos con almacenamiento en disco.
+- `PrismaModule`: acceso a la base de datos SQLite.
 
-```bash
-$ npm install
-```
+## Requisitos
 
-## Compile and run the project
+- Node.js
+- npm
+- SQLite (no requiere servidor externo)
 
-```bash
-# development
-$ npm run start
+## Variables de entorno
 
-# watch mode
-$ npm run start:dev
+El proyecto usa `@nestjs/config` y requiere al menos:
 
-# production mode
-$ npm run start:prod
-```
+- `JWT_SECRET`: clave secreta para tokens JWT.
+- `JWT_REFRESH_SECRET`: clave para refresh tokens JWT.
+- `PORT` (opcional, por defecto `3000`).
 
-## Run tests
+## Instalacion
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
+npx prisma generate
+npx prisma db push
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Ejecucion
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Modo desarrollo con recarga automatica:
 
-## Resources
+```bash
+npm run start:dev
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Produccion:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm run start:prod
+```
 
-## Support
+## Scripts disponibles
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- `npm run build`: compila la aplicacion Nest.
+- `npm run format`: formatea el codigo con Prettier.
+- `npm run lint`: ejecuta ESLint con correccion automotica.
+- `npm run test`: ejecuta pruebas con Jest.
+- `npm run test:watch`: ejecuta pruebas en modo watch.
+- `npm run test:cov`: genera cobertura de pruebas.
 
-## Stay in touch
+## API REST
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Autenticacion
 
-## License
+- `POST /auth/login`
+  - Body: `{ nombre_usuario, contraseña }`
+  - Guarda cookies `access_token` y `refresh_token`.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `POST /auth/refresh`
+  - Renueva ambos tokens usando `refresh_token`.
+
+- `POST /auth/logout`
+  - Elimina cookies de sesion.
+
+- `POST /auth/oAuthLogin`
+  - Login con proveedor OAuth.
+
+- `POST /auth/register`
+  - Registro de usuario con contraseña.
+
+- `POST /auth/registerAuth`
+  - Registro de usuario usando proveedor OAuth.
+
+### Archivos
+
+- `POST /files/upload`
+  - Subida de archivos con campo `files`.
+  - Guarda archivos en `./uploads`.
+
+## API GraphQL
+
+Endpoint principal: `http://localhost:3000/graphql`
+
+### Consultas
+
+- `searchPosts(filter: SearchPostInput)`: busqueda de publicaciones.
+- `posts`: feed de publicaciones.
+- `findFriends`: usuarios seguidos.
+- `findOneUser(id_user: Int)`: perfil de usuario.
+- `getComment`: obtener todos los comentarios.
+- `getCommentsByParent(comment_id: Int)`: comentarios hijos.
+- `getMessages(input: SearchMessageDto)`: mensajes entre usuarios.
+- `getBadges`: lista de insignias.
+- `getPet`: mascota del usuario autenticado.
+
+### Mutaciones protegidas
+
+Requieren JWT valido en GraphQL:
+
+- `createPost(input: CreatePostInput)`
+- `deletePost(post: DeletePost)`
+- `addReaction(input: AddReaction)`
+- `updatePost(input: UpdatePostInput)`
+- `createComment(input: CreateCommentInput)`
+- `deleteComment(comment_id: Int)`
+- `addReactions(input: AddReactions)`
+- `updateMessage(input: UpdateMessage)`
+- `createMessage(input: CreateMessage)`
+- `removeMessage(input: DeleteMessage)`
+- `toggleFollow(id_user: Int)`
+
+### Mutaciones de administrador
+
+- `createBadge(input: CreateBadgeDto)`
+- `updateBadge(input: UpdateBadge)`
+- `deleteRole(id: Int)`
+
+### Suscripciones en tiempo real
+
+- `addedReaction`: nueva reaccion a publicacion.
+- `toogledFollow`: cambio en follow/unfollow.
+- `newMessage`: mensaje creado.
+- `deleteMessage`: mensaje eliminado.
+- `updatedMessage`: mensaje actualizado.
+
+## Base de datos
+
+Modelo de datos principal en `prisma/schema.prisma`:
+
+- `Usuario`
+- `Post`
+- `Comentario`
+- `Mensaje`
+- `Mascota`
+- `Insignia`
+- `Follow`
+- `AuthAcount`
+- `PostReactions`
+- `ComentarioReactions`
+- `Files_Post`, `Files_Comment`, `Files_Mensaje`
+
+## Observaciones importantes
+
+- El endpoint GraphQL se genera automaticamente en `src/schema.gql`.
+- Las cookies `access_token` y `refresh_token` se configuran con `httpOnly` y `sameSite: lax`.
+- En desarrollo el flag `secure` esta en `false`; en produccion debe activarse.
+- `OptionalJwtAuthGuard` permite peticiones anonimas al feed para que el contenido publico pueda consultarse sin sesion.
+
+## Notas de uso
+
+- Use `POST /files/upload` con `multipart/form-data` y campo `files`.
+- Para GraphQL, primero autentique con `/auth/login` y use las cookies generadas.
+- El backend esta diseñado para funcionar con SQLite local y no requiere servidor de bases de datos adicional.
