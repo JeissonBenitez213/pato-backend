@@ -170,7 +170,7 @@ Modelo de datos principal en `prisma/schema.prisma`:
 ## Observaciones importantes
 
 - El endpoint GraphQL se genera automaticamente en `src/schema.gql`.
-- Las cookies `access_token` y `refresh_token` se configuran con `httpOnly` y `sameSite: lax`.
+- Las cookies `access_token` y `refresh_token` se configuran con `httpOnly` y `sameSite: none` para que el frontend de otro origen pueda usarlas.
 - En desarrollo el flag `secure` esta en `false`; en produccion debe activarse.
 - `OptionalJwtAuthGuard` permite peticiones anonimas al feed para que el contenido publico pueda consultarse sin sesion.
 

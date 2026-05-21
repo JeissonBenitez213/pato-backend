@@ -93,6 +93,26 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async validateAccessToken(token: string) {
+    if (!token) {
+      throw new UnauthorizedException('No access token provided');
+    }
+
+    const payload = await this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    const user = await this.prisma.usuario.findUnique({
+      where: { id_usuario: payload.sub },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
+  }
+
   async loginOAuth(data: LoginAuth) {
     const user = await this.prisma.authAcount.findUnique({
       where: {

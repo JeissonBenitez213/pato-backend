@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   Res,
@@ -24,15 +25,17 @@ export class AuthController {
 
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      secure: false, //poner en true para producción
-      sameSite: 'lax',
+      secure: false, // poner en true para producción
+      sameSite: 'none',
+      path: '/',
       maxAge: 1000 * 60 * 15,
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: false, //poner en true para producción
-      sameSite: 'lax',
+      secure: false, // poner en true para producción
+      sameSite: 'none',
+      path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
@@ -50,19 +53,34 @@ export class AuthController {
 
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      secure: false, //poner en true para producción
-      sameSite: 'lax',
+      secure: false, // poner en true para producción
+      sameSite: 'none',
+      path: '/',
       maxAge: 1000 * 60 * 15,
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: false, //poner en true para producción
-      sameSite: 'lax',
+      secure: false, // poner en true para producción
+      sameSite: 'none',
+      path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
     return { ok: true };
+  }
+
+  @Get('me')
+  async me(@Req() req: Request) {
+    const accessToken = req.cookies?.access_token;
+    const user = await this.authService.validateAccessToken(accessToken);
+
+    return {
+      authenticated: true,
+      id: user.id_usuario,
+      nombre_usuario: user.nombre_usuario,
+      is_admin: user.is_admin,
+    };
   }
 
   @Post('oAuthLogin')
@@ -75,15 +93,17 @@ export class AuthController {
 
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      secure: false, //poner en true para producción
-      sameSite: 'lax',
+      secure: false, // poner en true para producción
+      sameSite: 'none',
+      path: '/',
       maxAge: 1000 * 60 * 15,
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      secure: false, //poner en true para producción
-      sameSite: 'lax',
+      secure: false, // poner en true para producción
+      sameSite: 'none',
+      path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
@@ -96,8 +116,18 @@ export class AuthController {
 
     if (token) {
       const logouted = await this.authService.logout(token);
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
+      res.clearCookie('access_token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'none',
+        path: '/',
+      });
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'none',
+        path: '/',
+      });
       return { ok: true };
     }
 
