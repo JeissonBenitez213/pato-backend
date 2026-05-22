@@ -18,6 +18,8 @@ export class AuthService {
   ) {}
 
   async login(login: Login) {
+    // SQL equivalent:
+    // SELECT * FROM Usuario WHERE nombre_usuario = ? LIMIT 1;
     const user = await this.prisma.usuario.findUnique({
       where: {
         nombre_usuario: login.nombre_usuario,
@@ -50,6 +52,8 @@ export class AuthService {
       secret: process.env.JWT_REFRESH_SECRET,
     });
 
+    // SQL equivalent:
+    // SELECT * FROM Usuario WHERE id_usuario = ? LIMIT 1;
     const user = await this.prisma.usuario.findUnique({
       where: { id_usuario: payload.sub },
     });
@@ -85,6 +89,8 @@ export class AuthService {
 
     const hashedRefresh = await hash(refreshToken, 10);
 
+    // SQL equivalent:
+    // UPDATE Usuario SET refresh_token = ? WHERE id_usuario = ?;
     await this.prisma.usuario.update({
       where: { id_usuario: user.id_usuario },
       data: { refresh_token: hashedRefresh },
@@ -102,6 +108,8 @@ export class AuthService {
       secret: process.env.JWT_SECRET,
     });
 
+    // SQL equivalent:
+    // SELECT * FROM Usuario WHERE id_usuario = ? LIMIT 1;
     const user = await this.prisma.usuario.findUnique({
       where: { id_usuario: payload.sub },
     });
@@ -114,6 +122,10 @@ export class AuthService {
   }
 
   async loginOAuth(data: LoginAuth) {
+    // SQL equivalent:
+    // SELECT a.*, u.* FROM AuthAcount a
+    // JOIN Usuario u ON u.id_usuario = a.userId
+    // WHERE a.provider = ? AND a.provider_id = ? LIMIT 1;
     const user = await this.prisma.authAcount.findUnique({
       where: {
         provider_provider_id: {
@@ -138,23 +150,37 @@ export class AuthService {
       throw new UnauthorizedException('usuario o contraseña incorrectas');
     }
 
-    const hashed_password = await hash(data.contraseña, 10);
-
-    const newUser = await this.prisma.usuario.create({
-      data: {
+    const validateUser = await this.prisma.usuario.findUnique({
+      where: {
         nombre_usuario: data.nombre_usuario,
-        contraseña_hash: hashed_password,
       },
     });
 
-    this.eventEmitter.emit('user.registered', {
-      userId: newUser.id_usuario,
-    });
+    if (!validateUser) {
+      const hashed_password = await hash(data.contraseña, 10);
 
-    return newUser;
+      const newUser = await this.prisma.usuario.create({
+        data: {
+          nombre_usuario: data.nombre_usuario,
+          contraseña_hash: hashed_password,
+        },
+      });
+
+      this.eventEmitter.emit('user.registered', {
+        userId: newUser.id_usuario,
+      });
+
+      return newUser;
+    }
+
+    throw new UnauthorizedException('usuario ya existente');
   }
 
   async registerAuth(data: RegisterAuth) {
+    // SQL equivalent:
+    // INSERT INTO Usuario (nombre_usuario) VALUES (?);
+    // INSERT INTO AuthAcount (provider, provider_id, userId)
+    // VALUES (?, ?, LAST_INSERT_ID());
     const newUser = await this.prisma.usuario.create({
       data: {
         nombre_usuario: data.username,
@@ -179,6 +205,8 @@ export class AuthService {
       secret: process.env.JWT_REFRESH_SECRET,
     });
 
+    // SQL equivalent:
+    // UPDATE Usuario SET refresh_token = NULL WHERE id_usuario = ?;
     const logouted = await this.prisma.usuario.update({
       where: { id_usuario: payload.sub },
       data: {

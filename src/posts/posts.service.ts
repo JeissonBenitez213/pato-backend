@@ -21,7 +21,6 @@ export class PostsService {
 
   async create(post: CreatePostInput, userId: number) {
     const { files, ...rest } = post;
-
     const newPost = await this.prisma.post.create({
       data: {
         ...rest,
@@ -112,6 +111,8 @@ export class PostsService {
     const sharedPosts = new Set<number>();
 
     if (userId) {
+      // SQL equivalent:
+      // SELECT id_post, like, favorites, share FROM PostReactions WHERE id_usuario = ?;
       const reactions = await this.prisma.postReactions.findMany({
         where: {
           id_usuario: userId,
@@ -131,6 +132,13 @@ export class PostsService {
       }
     }
 
+    // SQL equivalent:
+    // SELECT p.*, c.*, r.*, f.* FROM Post p
+    // LEFT JOIN Comentario c ON c.id_post = p.id_post
+    // LEFT JOIN PostReactions r ON r.id_post = p.id_post
+    // LEFT JOIN Files_Post f ON f.id_post = p.id_post
+    // ORDER BY p.fecha_publicacion DESC
+    // LIMIT ? OFFSET ?;
     const posts = await this.prisma.post.findMany({
       take: limit,
       skip: cursor ? 1 : 0,
@@ -201,12 +209,16 @@ export class PostsService {
 
   async getStats(id_post: number) {
     const [comentarios, reactions] = await Promise.all([
+      // SQL equivalent:
+      // SELECT COUNT(*) FROM Comentario WHERE id_post = ?;
       this.prisma.comentario.count({
         where: {
           id_post,
         },
       }),
 
+      // SQL equivalent:
+      // SELECT like, favorites, share FROM PostReactions WHERE id_post = ?;
       this.prisma.postReactions.findMany({
         where: {
           id_post,
@@ -232,6 +244,12 @@ export class PostsService {
   }
 
   async findByFilter(filter: SearchPostInput, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Post p
+    // JOIN Usuario u ON u.id_usuario = p.id_usuario
+    // WHERE (p.title ILIKE '%search%' OR p.description ILIKE '%search%')
+    //   AND u.nombre_usuario ILIKE '%username%'
+    // ORDER BY p.fecha_publicacion DESC;
     return this.prisma.post.findMany({
       ...select,
 
@@ -277,6 +295,8 @@ export class PostsService {
   }
 
   async updateReaction(input: UpdatePostInput, user_id: number, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Post WHERE id_post = ? AND id_usuario = ? LIMIT 1;
     const validate = await this.prisma.post.findFirst({
       where: {
         AND: [{ id_post: input.id_post }, { id_usuario: user_id }],
@@ -287,6 +307,8 @@ export class PostsService {
       throw new UnauthorizedException('no eres el dueño del post');
     }
 
+    // SQL equivalent:
+    // UPDATE Post SET title = ?, description = ? WHERE id_post = ?;
     const updatePost = await this.prisma.post.update({
       where: {
         id_post: input.id_post,
@@ -307,6 +329,11 @@ export class PostsService {
       Object.entries(reactions).filter(([_, value]) => value !== undefined),
     );
 
+    // SQL equivalent:
+    // IF EXISTS (SELECT 1 FROM PostReactions WHERE id_usuario = ? AND id_post = ?)
+    //   UPDATE PostReactions SET ... WHERE id_usuario = ? AND id_post = ?;
+    // ELSE
+    //   INSERT INTO PostReactions (id_post, id_usuario, ...) VALUES (...);
     const reaction = await this.prisma.postReactions.upsert({
       where: {
         id_usuario_id_post: {

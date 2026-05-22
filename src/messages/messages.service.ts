@@ -9,6 +9,10 @@ export class MessagesService {
   constructor(private prisma: PrismaService) {}
 
   async getMessages(id_usuario_envia: number, id_usuario_recibe: number) {
+    // SQL equivalent:
+    // SELECT m.*, f.* FROM Mensaje m
+    // LEFT JOIN Files_Mensaje f ON f.id_mensaje = m.id_mensaje
+    // WHERE m.id_usuario_envia = ? AND m.id_usuario_recibe = ?;
     const messages = await this.prisma.mensaje.findMany({
       where: {
         AND: [
@@ -25,6 +29,10 @@ export class MessagesService {
   }
 
   async createMessage(input: CreateMessage) {
+    // SQL equivalent:
+    // INSERT INTO Mensaje (id_usuario_envia, id_usuario_recibe, texto)
+    // VALUES (?, ?, ?);
+    // INSERT INTO Files_Mensaje (id_mensaje, dir, fie_extension) VALUES (...);
     const newMessage = await this.prisma.mensaje.create({
       data: {
         id_usuario_envia: input.id_usuario_envia,
@@ -50,6 +58,8 @@ export class MessagesService {
   }
 
   async deleteMessage(input: DeleteMessage) {
+    // SQL equivalent:
+    // DELETE FROM Mensaje WHERE id_mensaje = ?;
     const delete_message = await this.prisma.mensaje.delete({
       where: {
         id_mensaje: input.id_mensaje,
@@ -60,6 +70,8 @@ export class MessagesService {
   }
 
   async updateMessage(input: UpdateMessage) {
+    // SQL equivalent:
+    // UPDATE Mensaje SET texto = ? WHERE id_mensaje = ?;
     const updated_message = await this.prisma.mensaje.update({
       where: {
         id_mensaje: input.id_mensaje,

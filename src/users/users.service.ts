@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -29,6 +28,8 @@ export class UsersService {
   }
 
   async findOneUser(id_user: number, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Usuario WHERE id_usuario = ? LIMIT 1;
     const user = await this.prisma.usuario.findUnique({
       where: {
         id_usuario: id_user,
@@ -40,6 +41,8 @@ export class UsersService {
   }
 
   async toggleFollow(id_user: number, id_user_to_follow: number, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Follow WHERE follower_id = ? AND following_id = ? LIMIT 1;
     const validateUser = await this.prisma.follow.findUnique({
       where: {
         follower_id_following_id: {
@@ -50,6 +53,8 @@ export class UsersService {
     });
 
     if (!validateUser) {
+      // SQL equivalent:
+      // INSERT INTO Follow (follower_id, following_id) VALUES (?, ?);
       const follow = await this.prisma.follow.create({
         data: {
           follower_id: id_user,
@@ -67,6 +72,8 @@ export class UsersService {
       };
     }
 
+    // SQL equivalent:
+    // DELETE FROM Follow WHERE follower_id = ? AND following_id = ?;
     const follow = await this.prisma.follow.delete({
       where: {
         follower_id_following_id: {

@@ -228,6 +228,7 @@ type Query {
   getComment: [Comentario!]!
   getCommentsByParent(comment_id: Float!): [Comentario!]!
   getMessages(input: SearchMessageDto!): [Message!]!
+  getMyData: User!
   getPet: Pet!
   posts: [Post!]!
   searchPosts(filter: SearchPostInput!): [Post!]!
@@ -274,7 +275,7 @@ type User {
   avatar: String!
   comentarios: [Comentario!]
   descripcion: String
-  email: String!
+  email: String
   fecha_registro: DateTime!
   id_usuario: Int!
   insignias: [BadgesUsers!]

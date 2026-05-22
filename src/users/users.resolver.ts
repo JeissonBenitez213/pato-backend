@@ -25,7 +25,7 @@ export class UsersResolver {
   @Query(() => [User])
   @UseGuards(GqlAuthGuard)
   async findFriends(@Context() ctx: any, @Info() info: GraphQLResolveInfo) {
-    const userId = ctx.req.user?.id_usuario;
+    const userId = ctx.req.user?.id;
 
     const select = new PrismaSelect(info).value;
     const friends = await this.usersService.findAllFriends(userId, select);
@@ -40,6 +40,17 @@ export class UsersResolver {
   ) {
     const select = new PrismaSelect(info).value;
     const user = await this.usersService.findOneUser(id_user, select);
+    return user;
+  }
+
+  @Query(() => User)
+  @UseGuards(GqlAuthGuard)
+  async getMyData(@Context() ctx: any, @Info() info: GraphQLResolveInfo) {
+    const select = new PrismaSelect(info).value;
+    const id = ctx.req.user?.id;
+    console.log(id);
+    const user = await this.usersService.findOneUser(id, select);
+
     return user;
   }
 

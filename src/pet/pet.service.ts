@@ -7,6 +7,8 @@ export class PetService {
   constructor(private prisma: PrismaService) {}
 
   async getPet(id_user: number, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Mascota WHERE id_usuario = ? LIMIT 1;
     return await this.prisma.mascota.findFirst({
       where: {
         id_usuario: id_user,
@@ -16,6 +18,8 @@ export class PetService {
   }
 
   async create(id_user: number, select: any) {
+    // SQL equivalent:
+    // INSERT INTO Mascota (id_usuario) VALUES (?);
     return await this.prisma.mascota.create({
       data: {
         id_usuario: id_user,
@@ -25,6 +29,8 @@ export class PetService {
   }
 
   async updatePet(id_user: number, select: any, input: UpdatePetInput) {
+    // SQL equivalent:
+    // SELECT * FROM Mascota WHERE id_usuario = ? LIMIT 1;
     const pet = await this.prisma.mascota.findUnique({
       where: {
         id_usuario: id_user,
@@ -53,6 +59,10 @@ export class PetService {
       leveledUp = true;
     }
 
+    // SQL equivalent:
+    // UPDATE Mascota
+    // SET nivel_actual = ?, puntos_experiencia = ?, fecha_ultima_evolucion = ?
+    // WHERE id_usuario = ?;
     const updatedPet = await this.prisma.mascota.update({
       where: {
         id_usuario: id_user,

@@ -13,6 +13,8 @@ export class BadgesService {
       ...input,
     };
 
+    // SQL equivalent:
+    // INSERT INTO Insignia (nombre, descripcion, icono) VALUES (?, ?, ?);
     const newBadge = await this.prisma.insignia.create({
       data,
       ...select,
@@ -28,6 +30,8 @@ export class BadgesService {
       ),
     ) as Prisma.InsigniaCreateInput;
 
+    // SQL equivalent:
+    // UPDATE Insignia SET ... WHERE id_insignia = 1;
     return this.prisma.insignia.update({
       where: {
         id_insignia: 1,
@@ -38,6 +42,8 @@ export class BadgesService {
   }
 
   async delete(id: number, select: any) {
+    // SQL equivalent:
+    // DELETE FROM Insignia WHERE id_insignia = ?;
     const badge = await this.prisma.insignia.delete({
       where: {
         id_insignia: id,
@@ -49,6 +55,8 @@ export class BadgesService {
   }
 
   async getBadges(select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Insignia;
     return await this.prisma.insignia.findMany({ ...select });
   }
 }

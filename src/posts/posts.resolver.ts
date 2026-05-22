@@ -56,7 +56,7 @@ export class PostsResolver {
       delete select.select.stats;
     }
 
-    const userId = ctx.req.user?.id_usuario ?? null;
+    const userId = ctx.req.user?.id;
 
     return this.postsService.feed(select, userId);
   }

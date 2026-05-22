@@ -17,6 +17,9 @@ export class PetListener {
 
     today.setHours(0, 0, 0, 0);
 
+    // SQL equivalent:
+    // SELECT COUNT(*) FROM Post
+    // WHERE id_usuario = ? AND fecha_publicacion >= ?;
     const todayPosts = await this.prisma.post.count({
       where: {
         id_usuario: payload.userId,
@@ -48,6 +51,9 @@ export class PetListener {
 
     today.setHours(0, 0, 0, 0);
 
+    // SQL equivalent:
+    // SELECT COUNT(*) FROM Comentario
+    // WHERE id_usuario = ? AND fecha >= ?;
     const todayComments = await this.prisma.comentario.count({
       where: {
         id_usuario: payload.userId,

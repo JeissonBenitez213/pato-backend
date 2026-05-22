@@ -26,7 +26,7 @@ export class AuthController {
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: false, // poner en true para producción
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 15,
     });
@@ -34,7 +34,7 @@ export class AuthController {
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: false, // poner en true para producción
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
@@ -54,7 +54,7 @@ export class AuthController {
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: false, // poner en true para producción
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 15,
     });
@@ -62,7 +62,7 @@ export class AuthController {
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: false, // poner en true para producción
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
@@ -94,7 +94,7 @@ export class AuthController {
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: false, // poner en true para producción
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 15,
     });
@@ -102,7 +102,7 @@ export class AuthController {
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
       secure: false, // poner en true para producción
-      sameSite: 'none',
+      sameSite: 'lax',
       path: '/',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
@@ -119,13 +119,13 @@ export class AuthController {
       res.clearCookie('access_token', {
         httpOnly: true,
         secure: false,
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
       });
       res.clearCookie('refresh_token', {
         httpOnly: true,
         secure: false,
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
       });
       return { ok: true };

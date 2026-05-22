@@ -17,6 +17,8 @@ export class CommentsService {
   ) {}
 
   async getComments(select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Comentario WHERE id_comentario_padre IS NULL;
     return await this.prisma.comentario.findMany({
       where: {
         id_comentario_padre: null,
@@ -26,6 +28,8 @@ export class CommentsService {
   }
 
   async getCommentByParents(idComment: number, content: any) {
+    // SQL equivalent:
+    // SELECT * FROM Comentario WHERE id_comentario_padre = ?;
     return await this.prisma.comentario.findMany({
       where: {
         id_comentario_padre: idComment,
@@ -35,6 +39,9 @@ export class CommentsService {
   }
 
   async create(input: CreateCommentInput, select: any, userId: number) {
+    // SQL equivalent:
+    // INSERT INTO Comentario (id_usuario, texto, id_post) VALUES (?, ?, ?);
+    // INSERT INTO Files_Comment (id_comment, dir, file_extension) VALUES (...);
     const newComment = await this.prisma.comentario.create({
       data: {
         id_usuario: userId,
@@ -62,6 +69,8 @@ export class CommentsService {
   }
 
   async delete(id_comment: number, id_user: number, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Comentario WHERE id_comentario = ? AND id_usuario = ? LIMIT 1;
     const validate = await this.prisma.comentario.findFirst({
       where: { AND: [{ id_comentario: id_comment }, { id_usuario: id_user }] },
     });
@@ -70,6 +79,8 @@ export class CommentsService {
       throw new UnauthorizedException('operacion no permitida');
     }
 
+    // SQL equivalent:
+    // DELETE FROM Comentario WHERE id_comentario = ?;
     const deleteMessage = await this.prisma.comentario.delete({
       where: {
         id_comentario: id_comment,
@@ -81,6 +92,8 @@ export class CommentsService {
   }
 
   async addReactions(select: any, user_id: number, input: AddReactions) {
+    // SQL equivalent:
+    // SELECT * FROM Comentario WHERE id_comentario = ? LIMIT 1;
     const validate = await this.prisma.comentario.findFirst({
       where: {
         id_comentario: input.id_comment,
@@ -97,6 +110,11 @@ export class CommentsService {
       Object.entries(rest).filter(([_, v]) => v !== undefined),
     );
 
+    // SQL equivalent:
+    // IF EXISTS (SELECT 1 FROM ComentarioReactions WHERE id_comment = ? AND id_usuario = ?)
+    //   UPDATE ComentarioReactions SET ... WHERE id_comment = ? AND id_usuario = ?;
+    // ELSE
+    //   INSERT INTO ComentarioReactions (id_comment, id_usuario, ...) VALUES (...);
     const addReaction = await this.prisma.comentarioReactions.upsert({
       where: {
         id_comment_id_usuario: {
@@ -122,6 +140,8 @@ export class CommentsService {
   }
 
   async updateComment(id_user: number, input: UpdateCommentInput, select: any) {
+    // SQL equivalent:
+    // SELECT * FROM Comentario WHERE id_comentario = ? AND id_usuario = ? LIMIT 1;
     const validate = await this.prisma.comentario.findFirst({
       where: {
         AND: [{ id_comentario: input.id_comentario }, { id_usuario: id_user }],
@@ -132,6 +152,8 @@ export class CommentsService {
       throw new NotFoundException('comentario no encontrado');
     }
 
+    // SQL equivalent:
+    // UPDATE Comentario SET texto = ? WHERE id_comentario = ?;
     const updatedComment = await this.prisma.comentario.update({
       where: {
         id_comentario: input.id_comentario,
