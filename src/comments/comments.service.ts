@@ -16,32 +16,60 @@ export class CommentsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async getComments(select: any) {
-    // SQL equivalent:
-    // SELECT * FROM Comentario WHERE id_comentario_padre IS NULL;
-    return await this.prisma.comentario.findMany({
+  async getComments(postId: number) {
+    // Equivalente en SQL Server:
+    // SELECT c.*, u.*, COUNT(r.id_comentario) AS respuestas_count
+    // FROM Comentario c
+    // LEFT JOIN Usuario u ON u.id_usuario = c.id_usuario
+    // LEFT JOIN Comentario r ON r.id_comentario_padre = c.id_comentario
+    // WHERE c.id_post = @postId AND c.id_comentario_padre IS NULL
+    // GROUP BY c.id_comentario, /* otras columnas de c */ u.id_usuario, /* otras columnas de u */
+    // ORDER BY c.fecha DESC;
+
+    return this.prisma.comentario.findMany({
       where: {
+        id_post: postId,
         id_comentario_padre: null,
       },
-      ...select,
+      include: {
+        usuario: true,
+        _count: {
+          select: {
+            respuestas: true,
+          },
+        },
+      },
+      orderBy: {
+        fecha: 'desc',
+      },
     });
   }
 
-  async getCommentByParents(idComment: number, content: any) {
-    // SQL equivalent:
-    // SELECT * FROM Comentario WHERE id_comentario_padre = ?;
-    return await this.prisma.comentario.findMany({
+  async getCommentReplies(commentId: number) {
+    return this.prisma.comentario.findMany({
       where: {
-        id_comentario_padre: idComment,
+        id_comentario_padre: commentId,
       },
-      ...content,
+      include: {
+        usuario: true,
+        _count: {
+          select: {
+            respuestas: true,
+          },
+        },
+      },
+      orderBy: {
+        fecha: 'asc',
+      },
     });
   }
 
   async create(input: CreateCommentInput, select: any, userId: number) {
     // SQL equivalent:
-    // INSERT INTO Comentario (id_usuario, texto, id_post) VALUES (?, ?, ?);
-    // INSERT INTO Files_Comment (id_comment, dir, file_extension) VALUES (...);
+    // INSERT INTO Comentario (id_usuario, texto, id_post)
+    // VALUES (?, ?, ?);
+    // INSERT INTO Archivo (dir, file_extension, id_comentario)
+    // VALUES (?, ?, LAST_INSERT_ID()) - for each file if input.files exists;
     const newComment = await this.prisma.comentario.create({
       data: {
         id_usuario: userId,
@@ -57,7 +85,8 @@ export class CommentsService {
             }
           : undefined,
       },
-      ...select,
+
+      ...(select?.value ?? {}),
     });
 
     this.eventEmitter.emit('comment.created', {

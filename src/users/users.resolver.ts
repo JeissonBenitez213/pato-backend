@@ -48,7 +48,6 @@ export class UsersResolver {
   async getMyData(@Context() ctx: any, @Info() info: GraphQLResolveInfo) {
     const select = new PrismaSelect(info).value;
     const id = ctx.req.user?.id;
-    console.log(id);
     const user = await this.usersService.findOneUser(id, select);
 
     return user;

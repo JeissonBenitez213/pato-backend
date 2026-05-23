@@ -102,9 +102,15 @@ export class PostsService {
     };
   }
 
-  async feed(select: any, userId?: number) {
-    const limit = select.take ?? 10;
-    const cursor = select.cursor;
+  async feed(
+    options: {
+      take?: number;
+      cursor?: number;
+    },
+    userId?: number,
+  ) {
+    const limit = options.take ?? 10;
+    const cursor = options.cursor;
 
     const likedPosts = new Set<number>();
     const favoritePosts = new Set<number>();
@@ -149,9 +155,14 @@ export class PostsService {
       },
 
       include: {
-        comentarios: true,
+        comentarios: {
+          include: {
+            usuario: true,
+          },
+        },
         reactions: true,
         files: true,
+        usuario: true,
       },
     });
 

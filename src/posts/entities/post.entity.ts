@@ -36,4 +36,7 @@ export class Post {
 
   @Field(() => PostStats)
   stats!: PostStats;
+
+  @Field(() => Number, { nullable: true })
+  score?: number;
 }

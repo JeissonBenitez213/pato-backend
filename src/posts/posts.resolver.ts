@@ -26,6 +26,7 @@ import { PostReactions } from './entities/postReactions.entity';
 import { AddReaction } from './dto/add-reaction.input';
 import { PubSub } from 'graphql-subscriptions';
 import { UpdatePostInput } from './dto/update-post.input';
+import { PostsFeed } from './entities/postfeed.entity';
 
 const pubSub = new PubSub();
 
@@ -47,18 +48,23 @@ export class PostsResolver {
     return this.postsService.findByFilter(filter, select);
   }
 
-  @Query(() => [Post], { name: 'posts' })
+  @Query(() => PostsFeed, { name: 'posts' })
   @UseGuards(OptionalJwtAuthGuard)
-  async posts(@Info() info: GraphQLResolveInfo, @Context() ctx: any) {
-    const select = new PrismaSelect(info).value;
-
-    if (select.select?.stats) {
-      delete select.select.stats;
-    }
-
+  async posts(@Context() ctx: any) {
     const userId = ctx.req.user?.id;
 
-    return this.postsService.feed(select, userId);
+    const take = Number(ctx.req.query?.take ?? 10);
+    const cursor = ctx.req.query?.cursor
+      ? Number(ctx.req.query.cursor)
+      : undefined;
+
+    return this.postsService.feed(
+      {
+        take,
+        cursor,
+      },
+      userId,
+    );
   }
 
   @ResolveField(() => PostStats)

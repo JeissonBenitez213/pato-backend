@@ -16,29 +16,30 @@ export class Comentario {
   id_usuario!: number;
 
   @Field(() => Int, { nullable: true })
-  id_comentario_padre!: number | null;
+  id_comentario_padre?: number | null;
 
   @Field(() => GraphQLISODateTime)
-  Fecha!: Date;
+  fecha!: Date;
 
   @Field(() => String, { nullable: true })
-  texto!: string | null;
+  texto?: string | null;
 
   @Field(() => Post)
-  Post!: Post;
+  post!: Post;
 
   @Field(() => User)
-  Usuario!: User;
+  usuario!: User;
 
   @Field(() => Comentario, { nullable: true })
-  Padre!: Comentario | null;
+  padre?: Comentario | null;
 
   @Field(() => [Comentario], { nullable: true })
-  Respuestas!: Comentario[];
+  respuestas?: Comentario[] | null;
 
+  // relaciones opcionales
   @Field(() => [FilesComment], { nullable: true })
-  files!: FilesComment[] | null;
+  files?: FilesComment[] | null;
 
   @Field(() => [ComentarioReactions], { nullable: true })
-  reactions!: ComentarioReactions | null;
+  reactions?: ComentarioReactions[] | null;
 }

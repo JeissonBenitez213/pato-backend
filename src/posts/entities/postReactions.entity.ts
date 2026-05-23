@@ -14,26 +14,26 @@ export class PostReactions {
   id_post!: number;
 
   @Field(() => Boolean)
-  Comentario!: boolean;
+  comentario!: boolean;
 
   @Field(() => Boolean)
-  Like!: boolean;
+  like!: boolean;
 
   @Field(() => Boolean)
-  Favorites!: boolean;
+  favorites!: boolean;
 
   @Field(() => Boolean)
-  Share!: boolean;
+  share!: boolean;
 
   @Field(() => GraphQLISODateTime)
-  Time_in!: Date;
+  time_in!: Date;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  Time_out!: Date | null;
+  time_out!: Date | null;
 
   @Field(() => Post)
-  Post!: Post;
+  post!: Post;
 
   @Field(() => User)
-  Usuario!: User;
+  usuario!: User;
 }
