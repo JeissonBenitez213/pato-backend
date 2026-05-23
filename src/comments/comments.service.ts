@@ -75,6 +75,7 @@ export class CommentsService {
         id_usuario: userId,
         texto: input.texto,
         id_post: input.id_post,
+        id_comentario_padre: input.id_comentario_padre,
 
         files: input.files
           ? {

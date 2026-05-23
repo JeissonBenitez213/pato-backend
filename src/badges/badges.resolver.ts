@@ -28,14 +28,14 @@ export class BadgesResolver {
     @Args('input') input: UpdateBadge,
     @Info() info: GraphQLResolveInfo,
   ) {
-    const select = new PrismaSelect(info).value();
+    const select = new PrismaSelect(info).value;
     return await this.badgesService.updateBadge(input, select);
   }
 
   @Mutation(() => Badge)
   @UseGuards(AdminRole)
   async deleteRole(@Args('id') id: number, @Info() info: GraphQLResolveInfo) {
-    const select = new PrismaSelect(info).value();
+    const select = new PrismaSelect(info).value;
     return await this.badgesService.delete(id, select);
   }
 

@@ -167,6 +167,7 @@ type Mutation {
   removeMessage(input: DeleteMessage!): Message!
   toggleFollow(id_user: Float!): FollowResponse!
   updateBadge(input: UpdateBadge!): Badge!
+  updateComment(input: UpdateCommentInput!): Comentario!
   updateMessage(input: UpdateMessage!): Message!
   updatePost(input: UpdatePostInput!): Post!
 }
@@ -253,9 +254,11 @@ input SearchPostInput {
 type Subscription {
   addedReaction: PostReactions!
   deleteMessage: Message!
+  deletedComment: Comentario!
   newComment: Comentario!
   newMessage: Message!
   toogledFollow: FollowResponse!
+  updatedComment: Comentario!
   updatedMessage: Message!
 }
 
@@ -264,6 +267,11 @@ input UpdateBadge {
   icono: String
   id_insignia: Int!
   nombre: String
+}
+
+input UpdateCommentInput {
+  id_comentario: Int!
+  texto: String!
 }
 
 input UpdateMessage {

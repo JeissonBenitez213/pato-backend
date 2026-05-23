@@ -43,8 +43,16 @@ export class CommentsResolver {
     @Info() info: GraphQLResolveInfo,
   ) {
     const userId = ctx.req.user?.id;
-    const select = new PrismaSelect(info).value();
-    return await this.commentsService.delete(comment_id, userId, select);
+    const select = new PrismaSelect(info).value;
+    const comment = await this.commentsService.delete(
+      comment_id,
+      userId,
+      select,
+    );
+    pubSub.publish('DELETE_COMMENT', {
+      deletedComment: comment,
+    });
+    return comment;
   }
 
   @Mutation(() => Comentario)
@@ -77,14 +85,22 @@ export class CommentsResolver {
 
   @Mutation(() => Comentario)
   @UseGuards(GqlAuthGuard)
-  async updateMessage(
+  async updateComment(
     @Args('input') input: UpdateCommentInput,
     @Info() info: GraphQLResolveInfo,
     @Context() ctx: any,
   ) {
     const userId = ctx.req.user?.id;
     const select = new PrismaSelect(info).value;
-    return await this.commentsService.updateComment(userId, input, select);
+    const comment = await this.commentsService.updateComment(
+      userId,
+      input,
+      select,
+    );
+    pubSub.publish('UPDATE_COMMENT', {
+      updatedComment: comment,
+    });
+    return comment;
   }
 
   @Subscription(() => Comentario, {
@@ -92,5 +108,19 @@ export class CommentsResolver {
   })
   async newComment() {
     return pubSub.asyncIterableIterator('NEW_COMMENT');
+  }
+
+  @Subscription(() => Comentario, {
+    resolve: (payload) => payload.updatedComment,
+  })
+  async updatedComment() {
+    return pubSub.asyncIterableIterator('UPDATE_COMMENT');
+  }
+
+  @Subscription(() => Comentario, {
+    resolve: (payload) => payload.deletedComment,
+  })
+  async deletedComment() {
+    return pubSub.asyncIterableIterator('DELETE_COMMENT');
   }
 }
