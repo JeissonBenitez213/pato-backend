@@ -6,25 +6,20 @@ export class AddReactions {
   @IsNotEmpty()
   @IsNumber()
   @Field(() => Int)
-  id_usuario!: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Field(() => Int)
   id_comment!: number;
 
   @IsOptional()
   @IsBoolean()
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   commented?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   like?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   share?: boolean;
 }

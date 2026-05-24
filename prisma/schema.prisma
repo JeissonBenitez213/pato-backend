@@ -21,7 +21,6 @@ model Usuario {
   descripcion       String?
   contraseña_hash   String?
   fecha_registro    DateTime @default(now())
-  bio               String?
   refresh_token     String?
   avatar            String  @default("https://placehold.co/300x300?text=Avatar")
   is_admin          Boolean @default(false)

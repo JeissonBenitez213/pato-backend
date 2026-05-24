@@ -22,11 +22,10 @@ input AddReaction {
 }
 
 input AddReactions {
-  commented: Boolean!
+  commented: Boolean
   id_comment: Int!
-  id_usuario: Int!
-  like: Boolean!
-  share: Boolean!
+  like: Boolean
+  share: Boolean
 }
 
 type Badge {
@@ -170,6 +169,7 @@ type Mutation {
   updateComment(input: UpdateCommentInput!): Comentario!
   updateMessage(input: UpdateMessage!): Message!
   updatePost(input: UpdatePostInput!): Post!
+  updateUser(input: UpdateUser!): User!
 }
 
 type Pet {
@@ -252,6 +252,7 @@ input SearchPostInput {
 }
 
 type Subscription {
+  addReaction: ComentarioReactions!
   addedReaction: PostReactions!
   deleteMessage: Message!
   deletedComment: Comentario!
@@ -260,6 +261,7 @@ type Subscription {
   toogledFollow: FollowResponse!
   updatedComment: Comentario!
   updatedMessage: Message!
+  updatedUser: User!
 }
 
 input UpdateBadge {
@@ -284,6 +286,13 @@ input UpdatePostInput {
   files: [FileInput!]
   id_post: Int!
   title: String!
+}
+
+input UpdateUser {
+  avatar: String
+  descripcion: String
+  email: String
+  nombre_usuario: String
 }
 
 type User {

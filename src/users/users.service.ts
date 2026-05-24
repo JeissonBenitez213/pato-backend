@@ -1,5 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateUser } from './dto/update_user.input';
+import { existsSync } from 'fs';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class UsersService {
@@ -91,5 +94,60 @@ export class UsersService {
       user: follow.following,
       following: false,
     };
+  }
+
+  async updateUser(id_user: number, input: UpdateUser, select: any) {
+    const userData = await this.prisma.usuario.findFirst({
+      where: {
+        id_usuario: id_user,
+      },
+    });
+
+    if (!userData) {
+      throw new UnauthorizedException('usuario no encontrado');
+    }
+
+    // si llega un nuevo avatar
+    if (input.avatar !== undefined && input.avatar !== userData.avatar) {
+      const oldAvatar = userData.avatar;
+
+      const isPlaceholder =
+        oldAvatar === 'https://placehold.co/300x300?text=Avatar';
+
+      // detectar si NO es una URL
+      const isLocalFile =
+        oldAvatar &&
+        !oldAvatar.startsWith('http://') &&
+        !oldAvatar.startsWith('https://');
+
+      // eliminar archivo anterior
+      if (isLocalFile && !isPlaceholder) {
+        try {
+          if (existsSync(oldAvatar)) {
+            await unlink(oldAvatar);
+          }
+        } catch (error) {
+          console.error('Error deleting old avatar:', error);
+        }
+      }
+    }
+
+    // limpiar undefined y null
+    const cleanData = Object.fromEntries(
+      Object.entries(input).filter(
+        ([_, value]) => value !== undefined && value !== null,
+      ),
+    );
+
+    const newUser = await this.prisma.usuario.update({
+      where: {
+        id_usuario: id_user,
+      },
+      data: {
+        ...cleanData,
+      },
+    });
+
+    return newUser;
   }
 }

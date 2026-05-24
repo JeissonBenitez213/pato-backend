@@ -255,49 +255,44 @@ export class PostsService {
   }
 
   async findByFilter(filter: SearchPostInput, select: any) {
-    // SQL equivalent:
-    // SELECT * FROM Post p
-    // JOIN Usuario u ON u.id_usuario = p.id_usuario
-    // WHERE (p.title ILIKE '%search%' OR p.description ILIKE '%search%')
-    //   AND u.nombre_usuario ILIKE '%username%'
-    // ORDER BY p.fecha_publicacion DESC;
+    const filters = [
+      filter.search
+        ? {
+            OR: [
+              {
+                title: {
+                  contains: filter.search,
+                },
+              },
+
+              {
+                description: {
+                  contains: filter.search,
+                },
+              },
+            ],
+          }
+        : null,
+
+      filter.username
+        ? {
+            usuario: {
+              nombre_usuario: {
+                contains: filter.username,
+              },
+            },
+          }
+        : null,
+    ].filter(Boolean);
+
     return this.prisma.post.findMany({
       ...select,
 
-      where: {
-        AND: [
-          filter.search
-            ? {
-                OR: [
-                  {
-                    title: {
-                      contains: filter.search,
-                      mode: 'insensitive',
-                    },
-                  },
-
-                  {
-                    description: {
-                      contains: filter.search,
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
-              }
-            : undefined,
-
-          filter.username
-            ? {
-                usuario: {
-                  nombre_usuario: {
-                    contains: filter.username,
-                    mode: 'insensitive',
-                  },
-                },
-              }
-            : undefined,
-        ],
-      },
+      where: filters.length
+        ? {
+            AND: filters,
+          }
+        : undefined,
 
       orderBy: {
         fecha_publicacion: 'desc',

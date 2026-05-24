@@ -80,7 +80,15 @@ export class CommentsResolver {
   ) {
     const user_id = ctx.req.user?.id;
     const select = new PrismaSelect(info).value;
-    return await this.commentsService.addReactions(select, user_id, input);
+    const reactions = await this.commentsService.addReactions(
+      select,
+      user_id,
+      input,
+    );
+
+    pubSub.publish('ADD_REACTION_COMMENT', { reactions });
+
+    return reactions;
   }
 
   @Mutation(() => Comentario)
@@ -122,5 +130,12 @@ export class CommentsResolver {
   })
   async deletedComment() {
     return pubSub.asyncIterableIterator('DELETE_COMMENT');
+  }
+
+  @Subscription(() => ComentarioReactions, {
+    resolve: (payload) => payload.reactions,
+  })
+  async addReaction() {
+    return pubSub.asyncIterableIterator('ADD_REACTION_COMMENT');
   }
 }

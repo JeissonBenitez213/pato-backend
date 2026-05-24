@@ -15,6 +15,7 @@ import type { GraphQLResolveInfo } from 'graphql';
 import { PrismaSelect } from '@paljs/plugins';
 import { FollowResponse } from './entities/follow_response.entity';
 import { PubSub } from 'graphql-subscriptions';
+import { UpdateUser } from './dto/update_user.input';
 
 const pubSub = new PubSub();
 
@@ -68,8 +69,29 @@ export class UsersResolver {
     });
   }
 
+  @Mutation(() => User)
+  @UseGuards(GqlAuthGuard)
+  async updateUser(
+    @Context() ctx: any,
+    @Args('input') input: UpdateUser,
+    @Info() info: GraphQLResolveInfo,
+  ) {
+    const userId = ctx.req.user?.id;
+    const select = new PrismaSelect(info).value;
+    const newUser = await this.usersService.updateUser(userId, input, select);
+    pubSub.publish('USER_UPDATE', { newUser });
+    return newUser;
+  }
+
   @Subscription(() => FollowResponse)
-  async toogledFollow() {
+  toogledFollow() {
     return pubSub.asyncIterableIterator('TOGGLE_FOLLOW');
+  }
+
+  @Subscription(() => User, {
+    resolve: (payload) => payload.newUser,
+  })
+  updatedUser() {
+    return pubSub.asyncIterableIterator('USER_UPDATE');
   }
 }
