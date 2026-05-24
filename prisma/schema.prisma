@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+
+model Usuario {
+  id_usuario        Int       @id @default(autoincrement())
+  nombre_usuario    String    @unique
+  email             String?   @unique
+  descripcion       String?
+  contraseña_hash   String?
+  fecha_registro    DateTime @default(now())
+  bio               String?
+  refresh_token     String?
+  avatar            String  @default("https://placehold.co/300x300?text=Avatar")
+  is_admin          Boolean @default(false)
+
+  mascota           Mascota?
+  posts             Post[]
+  comentarios       Comentario[]
+  mensajesEnviados  Mensaje[] @relation("MensajesEnviados")
+  mensajesRecibidos Mensaje[] @relation("MensajesRecibidos")
+  insignias         Usuario_Insignia[]
+
+  siguiendo Follow[] @relation("Siguiendo")
+  seguidores Follow[] @relation("Seguidores")
+
+  postReactions PostReactions[]
+  commentReactions ComentarioReactions[]
+  auths AuthAcount[]
+}
+
+model AuthAcount {
+  id          Int    @id @default(autoincrement())
+  id_usuario  Int
+
+  provider     String
+  provider_id  String
+
+  user Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@unique([provider, provider_id])
+}
+
+model Follow {
+  follower_id   Int
+  following_id  Int
+
+  createdAt DateTime @default(now())
+
+  follower  Usuario @relation("Siguiendo", fields: [follower_id], references: [id_usuario])
+  following Usuario @relation("Seguidores", fields: [following_id], references: [id_usuario])
+
+  @@id([follower_id, following_id])
+}
+
+model Mascota {
+  id_mascota             Int      @id @default(autoincrement())
+  id_usuario             Int      @unique
+  nivel_actual           Int      @default(1)
+  puntos_experiencia     Int      @default(0)
+  fecha_ultima_evolucion DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Post {
+  id_post            Int      @id @default(autoincrement())
+  id_usuario         Int
+
+  title              String
+  description        String?
+  fecha_publicacion  DateTime @default(now())
+
+  usuario      Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  comentarios  Comentario[]
+  files        Files_Post[]
+  reactions    PostReactions[]
+}
+
+model PostReactions {
+  id_postReaction Int      @id @default(autoincrement())
+  id_usuario      Int
+  id_post         Int
+
+  comentario Boolean @default(false)
+  like       Boolean @default(false)
+  favorites  Boolean @default(false)
+  share      Boolean @default(false)
+
+  time_in  DateTime @default(now())
+  time_out DateTime?
+
+  post    Post    @relation(fields: [id_post], references: [id_post], onDelete: Cascade)
+  usuario Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@unique([id_usuario, id_post])
+}
+
+model Files_Post {
+  id_file        Int    @id @default(autoincrement())
+  id_post        Int
+  dir            String
+  file_extension String
+
+  post Post @relation(fields: [id_post], references: [id_post], onDelete: Cascade)
+}
+
+model Comentario {
+  id_comentario        Int      @id @default(autoincrement())
+  id_post              Int
+  id_usuario           Int
+  id_comentario_padre  Int?
+  fecha                DateTime @default(now())
+  texto                String?
+
+  post    Post    @relation(fields: [id_post], references: [id_post], onDelete: Cascade)
+  usuario Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  padre Comentario? @relation("ComentarioPadre",fields: [id_comentario_padre],references: [id_comentario],onDelete: Cascade)
+
+  respuestas Comentario[] @relation("ComentarioPadre")
+
+  files      Files_Comment[]
+  reactions  ComentarioReactions[]
+}
+
+model ComentarioReactions {
+  id_reaction Int @id @default(autoincrement())
+
+  id_usuario Int
+  id_comment Int
+
+  commented Boolean @default(false)
+  like      Boolean @default(false)
+  share     Boolean @default(false)
+
+  comment Comentario @relation(fields: [id_comment], references: [id_comentario], onDelete: Cascade)
+  usuario Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  @@unique([id_comment,id_usuario])
+}
+
+model Files_Comment {
+  id_file        Int @id @default(autoincrement())
+  id_comment     Int
+  dir            String
+  file_extension String
+
+  comentario Comentario @relation(fields: [id_comment], references: [id_comentario], onDelete: Cascade)
+}
+
+model Mensaje {
+  id_mensaje         Int      @id @default(autoincrement())
+  id_usuario_envia   Int
+  id_usuario_recibe  Int
+  texto              String
+  fecha              DateTime @default(now())
+  leido              Boolean  @default(false)
+  editado            Boolean  @default(false)
+
+  envia   Usuario @relation("MensajesEnviados", fields: [id_usuario_envia], references: [id_usuario])
+  recibe  Usuario @relation("MensajesRecibidos", fields: [id_usuario_recibe], references: [id_usuario])
+
+  files Files_Mensaje[]
+}
+
+model Files_Mensaje {
+  id_file        Int    @id @default(autoincrement())
+  id_mensaje     Int
+  dir            String
+  file_extension String
+
+  mensaje Mensaje @relation(fields: [id_mensaje], references: [id_mensaje], onDelete: Cascade)
+}
+
+model Insignia {
+  id_insignia       Int      @id @default(autoincrement())
+  nombre            String   @unique
+  descripcion       String?
+  icono             String?
+  puntos_requeridos Int?
+
+  usuarios Usuario_Insignia[]
+}
+
+model Usuario_Insignia {
+  id_usuario    Int
+  id_insignia   Int
+  fecha_otorgada DateTime @default(now())
+
+  usuario  Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  insignia Insignia @relation(fields: [id_insignia], references: [id_insignia])
+
+  @@id([id_insignia, id_usuario])
+}
