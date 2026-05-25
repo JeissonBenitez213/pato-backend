@@ -170,17 +170,6 @@ model Mensaje {
 
   envia   Usuario @relation("MensajesEnviados", fields: [id_usuario_envia], references: [id_usuario])
   recibe  Usuario @relation("MensajesRecibidos", fields: [id_usuario_recibe], references: [id_usuario])
-
-  files Files_Mensaje[]
-}
-
-model Files_Mensaje {
-  id_file        Int    @id @default(autoincrement())
-  id_mensaje     Int
-  dir            String
-  file_extension String
-
-  mensaje Mensaje @relation(fields: [id_mensaje], references: [id_mensaje], onDelete: Cascade)
 }
 
 model Insignia {

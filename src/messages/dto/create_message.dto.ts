@@ -6,8 +6,6 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { FilesMessage } from '../entities/files_message.entity';
-import { AddFilesMessage } from './add_files_message.dto';
 
 @InputType()
 export class CreateMessage {
@@ -25,9 +23,4 @@ export class CreateMessage {
   @IsString()
   @Field(() => String)
   texto!: string;
-
-  @IsArray()
-  @IsOptional()
-  @Field(() => [AddFilesMessage], { nullable: true })
-  files?: AddFilesMessage[];
 }

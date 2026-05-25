@@ -56,17 +56,13 @@ export class UsersResolver {
 
   @Mutation(() => FollowResponse)
   @UseGuards(GqlAuthGuard)
-  async toggleFollow(
-    @Context() ctx: any,
-    @Args('id_user') id_user: number,
-    @Info() info: GraphQLResolveInfo,
-  ) {
-    const select = new PrismaSelect(info).value;
-    const userId = ctx.req.user?.id_usuario;
-    const data = await this.usersService.toggleFollow(userId, id_user, select);
+  async toggleFollow(@Context() ctx: any, @Args('id_user') id_user: number) {
+    const userId = ctx.req.user?.id;
+    const data = await this.usersService.toggleFollow(userId, id_user);
     await pubSub.publish('TOGGLE_FOLLOW', {
       data,
     });
+    return data;
   }
 
   @Mutation(() => User)

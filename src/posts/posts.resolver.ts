@@ -58,13 +58,15 @@ export class PostsResolver {
       ? Number(ctx.req.query.cursor)
       : undefined;
 
-    return this.postsService.feed(
+    const feed = await this.postsService.feed(
       {
         take,
         cursor,
       },
       userId,
     );
+    console.log(feed);
+    return feed;
   }
 
   @ResolveField(() => PostStats)

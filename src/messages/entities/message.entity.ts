@@ -1,6 +1,5 @@
 import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
 import { User } from 'src/users/entities/user.entity';
-import { FilesMessage } from './files_message.entity';
 
 @ObjectType()
 export class Message {
@@ -30,7 +29,4 @@ export class Message {
 
   @Field(() => User)
   recibe!: User;
-
-  @Field(() => [FilesMessage], { nullable: true })
-  files!: FilesMessage[] | null;
 }

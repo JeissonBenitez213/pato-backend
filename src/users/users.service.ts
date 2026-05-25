@@ -43,9 +43,7 @@ export class UsersService {
     return user;
   }
 
-  async toggleFollow(id_user: number, id_user_to_follow: number, select: any) {
-    // SQL equivalent:
-    // SELECT * FROM Follow WHERE follower_id = ? AND following_id = ? LIMIT 1;
+  async toggleFollow(id_user: number, id_user_to_follow: number) {
     const validateUser = await this.prisma.follow.findUnique({
       where: {
         follower_id_following_id: {
@@ -56,16 +54,18 @@ export class UsersService {
     });
 
     if (!validateUser) {
-      // SQL equivalent:
-      // INSERT INTO Follow (follower_id, following_id) VALUES (?, ?);
       const follow = await this.prisma.follow.create({
         data: {
           follower_id: id_user,
           following_id: id_user_to_follow,
         },
-
-        select: {
-          following: select.select,
+        include: {
+          following: {
+            select: {
+              id_usuario: true,
+              nombre_usuario: true,
+            },
+          },
         },
       });
 
@@ -75,8 +75,6 @@ export class UsersService {
       };
     }
 
-    // SQL equivalent:
-    // DELETE FROM Follow WHERE follower_id = ? AND following_id = ?;
     const follow = await this.prisma.follow.delete({
       where: {
         follower_id_following_id: {
@@ -84,9 +82,13 @@ export class UsersService {
           following_id: id_user_to_follow,
         },
       },
-
-      select: {
-        following: select.select,
+      include: {
+        following: {
+          select: {
+            id_usuario: true,
+            nombre_usuario: true,
+          },
+        },
       },
     });
 

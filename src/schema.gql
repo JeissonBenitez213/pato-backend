@@ -7,12 +7,6 @@ input AddFiles {
   file_extension: String!
 }
 
-input AddFilesMessage {
-  dir: String!
-  fie_extension: String!
-  id_mensaje: Int!
-}
-
 input AddReaction {
   comentario: Boolean
   favorites: Boolean
@@ -82,7 +76,6 @@ input CreateCommentInput {
 }
 
 input CreateMessage {
-  files: [AddFilesMessage!]
   id_usuario_envia: Int!
   id_usuario_recibe: Int!
   texto: String!
@@ -120,13 +113,6 @@ type FilesComment {
   id_file: Int!
 }
 
-type FilesMessage {
-  dir: String!
-  fie_extension: String!
-  id_file: Int!
-  id_mensaje: Int!
-}
-
 type Follow {
   CreatedAt: DateTime!
   Follower: User!
@@ -144,7 +130,6 @@ type Message {
   editado: Boolean!
   envia: User!
   fecha: DateTime!
-  files: [FilesMessage!]
   id_mensaje: Int!
   id_usuario_envia: Int!
   id_usuario_recibe: Int!
@@ -254,13 +239,13 @@ input SearchPostInput {
 type Subscription {
   addReaction: ComentarioReactions!
   addedReaction: PostReactions!
-  deleteMessage: Message!
+  deleteMessage(userId: Float!): Message!
   deletedComment: Comentario!
   newComment: Comentario!
-  newMessage: Message!
+  newMessage(userId: Float!): Message!
   toogledFollow: FollowResponse!
   updatedComment: Comentario!
-  updatedMessage: Message!
+  updatedMessage(userId: Float!): Message!
   updatedUser: User!
 }
 

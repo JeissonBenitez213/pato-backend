@@ -158,6 +158,7 @@ export class PostsService {
         comentarios: {
           include: {
             usuario: true,
+            files: true,
           },
         },
         reactions: true,

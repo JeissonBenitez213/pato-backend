@@ -1,14 +1,11 @@
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
-
 import { UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { GqlAuthGuard } from 'src/auth/guards/guards.guard';
-
 import { MessagesService } from './messages.service';
 
 import { Message } from './entities/message.entity';
-
 import { SearchMessageDto } from './dto/search_message.dto';
 import { CreateMessage } from './dto/create_message.dto';
 import { DeleteMessage } from './dto/delete_message.dto';
@@ -20,6 +17,7 @@ const pubSub = new PubSub();
 export class MessagesResolver {
   constructor(private readonly messagesService: MessagesService) {}
 
+  /* ---------------- QUERY ---------------- */
   @Query(() => [Message])
   @UseGuards(GqlAuthGuard)
   async getMessages(@Args('input') input: SearchMessageDto) {
@@ -29,12 +27,19 @@ export class MessagesResolver {
     );
   }
 
+  /* ---------------- MUTATIONS ---------------- */
+
   @Mutation(() => Message)
   @UseGuards(GqlAuthGuard)
   async createMessage(@Args('input') input: CreateMessage) {
     const message = await this.messagesService.createMessage(input);
 
-    await pubSub.publish('NEW_MESSAGE', {
+    // 🔥 emitimos para ambos usuarios
+    await pubSub.publish(`NEW_MESSAGE_${input.id_usuario_envia}`, {
+      newMessage: message,
+    });
+
+    await pubSub.publish(`NEW_MESSAGE_${input.id_usuario_recibe}`, {
       newMessage: message,
     });
 
@@ -46,7 +51,11 @@ export class MessagesResolver {
   async removeMessage(@Args('input') input: DeleteMessage) {
     const message = await this.messagesService.deleteMessage(input);
 
-    await pubSub.publish('DELETE_MESSAGE', {
+    await pubSub.publish(`DELETE_MESSAGE_${message.id_usuario_envia}`, {
+      deleteMessage: message,
+    });
+
+    await pubSub.publish(`DELETE_MESSAGE_${message.id_usuario_recibe}`, {
       deleteMessage: message,
     });
 
@@ -58,25 +67,37 @@ export class MessagesResolver {
   async updateMessage(@Args('input') input: UpdateMessage) {
     const message = await this.messagesService.updateMessage(input);
 
-    await pubSub.publish('UPDATE_MESSAGE', {
+    await pubSub.publish(`UPDATE_MESSAGE_${message.id_usuario_envia}`, {
+      updatedMessage: message,
+    });
+
+    await pubSub.publish(`UPDATE_MESSAGE_${message.id_usuario_recibe}`, {
       updatedMessage: message,
     });
 
     return message;
   }
 
-  @Subscription(() => Message)
-  newMessage() {
-    return pubSub.asyncIterableIterator('NEW_MESSAGE');
+  /* ---------------- SUBSCRIPTIONS ---------------- */
+
+  @Subscription(() => Message, {
+    resolve: (payload) => payload.newMessage,
+  })
+  newMessage(@Args('userId') userId: number) {
+    return pubSub.asyncIterableIterator(`NEW_MESSAGE_${userId}`);
   }
 
-  @Subscription(() => Message)
-  deleteMessage() {
-    return pubSub.asyncIterableIterator('DELETE_MESSAGE');
+  @Subscription(() => Message, {
+    resolve: (payload) => payload.deleteMessage,
+  })
+  deleteMessage(@Args('userId') userId: number) {
+    return pubSub.asyncIterableIterator(`DELETE_MESSAGE_${userId}`);
   }
 
-  @Subscription(() => Message)
-  updatedMessage() {
-    return pubSub.asyncIterableIterator('UPDATE_MESSAGE');
+  @Subscription(() => Message, {
+    resolve: (payload) => payload.updatedMessage,
+  })
+  updatedMessage(@Args('userId') userId: number) {
+    return pubSub.asyncIterableIterator(`UPDATE_MESSAGE_${userId}`);
   }
 }
