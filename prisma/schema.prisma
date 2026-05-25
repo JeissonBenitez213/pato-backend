@@ -19,7 +19,7 @@ model Usuario {
   nombre_usuario    String    @unique
   email             String?   @unique
   descripcion       String?
-  contraseña_hash   String?
+  contraseña_hash   String
   fecha_registro    DateTime @default(now())
   refresh_token     String?
   avatar            String  @default("https://placehold.co/300x300?text=Avatar")
@@ -37,19 +37,6 @@ model Usuario {
 
   postReactions PostReactions[]
   commentReactions ComentarioReactions[]
-  auths AuthAcount[]
-}
-
-model AuthAcount {
-  id          Int    @id @default(autoincrement())
-  id_usuario  Int
-
-  provider     String
-  provider_id  String
-
-  user Usuario @relation(fields: [id_usuario], references: [id_usuario])
-
-  @@unique([provider, provider_id])
 }
 
 model Follow {
