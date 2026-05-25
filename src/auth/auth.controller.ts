@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Req,
   Res,
   UnauthorizedException,
@@ -13,6 +14,7 @@ import type { Request, Response } from 'express';
 import { LoginAuth } from './dto/loginAuth.dto';
 import { Register } from './dto/register.dto';
 import { RegisterAuth } from './dto/registerAuth.dto';
+import { NewPassword } from './dto/newPassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -83,33 +85,6 @@ export class AuthController {
     };
   }
 
-  @Post('oAuthLogin')
-  async oAuthLogin(
-    @Body() data: LoginAuth,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const user = await this.authService.loginOAuth(data);
-    const tokens = await this.authService.generateAuthTokens(user);
-
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: false, // poner en true para producción
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 1000 * 60 * 15,
-    });
-
-    res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      secure: false, // poner en true para producción
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
-
-    return { ok: true };
-  }
-
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const token = req.cookies?.refresh_token;
@@ -139,8 +114,10 @@ export class AuthController {
     return await this.authService.regiser(data);
   }
 
-  @Post('registerAuth')
-  async registerAuth(@Body() data: RegisterAuth) {
-    return await this.authService.registerAuth(data);
+  @Put('changePassword')
+  async updatePassword(@Body() data: NewPassword, @Req() req: Request) {
+    const token = req.cookies?.access_token;
+    const newPassword = await this.authService.changePassword(token, data);
+    return newPassword;
   }
 }

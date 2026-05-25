@@ -8,6 +8,7 @@ import { LoginAuth } from './dto/loginAuth.dto';
 import { Register } from './dto/register.dto';
 import { RegisterAuth } from './dto/registerAuth.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NewPassword } from './dto/newPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -121,30 +122,6 @@ export class AuthService {
     return user;
   }
 
-  async loginOAuth(data: LoginAuth) {
-    // SQL equivalent:
-    // SELECT a.*, u.* FROM AuthAcount a
-    // JOIN Usuario u ON u.id_usuario = a.userId
-    // WHERE a.provider = ? AND a.provider_id = ? LIMIT 1;
-    const user = await this.prisma.authAcount.findUnique({
-      where: {
-        provider_provider_id: {
-          provider: data.provider,
-          provider_id: data.provider_id,
-        },
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('invalid credentials');
-    }
-
-    return user.user;
-  }
-
   async regiser(data: Register) {
     if (data.contraseña != data.contraseña_repetida) {
       throw new UnauthorizedException('usuario o contraseña incorrectas');
@@ -176,30 +153,6 @@ export class AuthService {
     throw new UnauthorizedException('usuario ya existente');
   }
 
-  async registerAuth(data: RegisterAuth) {
-    // SQL equivalent:
-    // INSERT INTO Usuario (nombre_usuario) VALUES (?);
-    // INSERT INTO AuthAcount (provider, provider_id, userId)
-    // VALUES (?, ?, LAST_INSERT_ID());
-    const newUser = await this.prisma.usuario.create({
-      data: {
-        nombre_usuario: data.username,
-        auths: {
-          create: {
-            provider: data.provider,
-            provider_id: data.provider_id,
-          },
-        },
-      },
-    });
-
-    this.eventEmitter.emit('user.registered', {
-      userId: newUser.id_usuario,
-    });
-
-    return newUser;
-  }
-
   async logout(refreshToken: string) {
     const payload = this.jwtService.verify(refreshToken, {
       secret: process.env.JWT_REFRESH_SECRET,
@@ -215,5 +168,36 @@ export class AuthService {
     });
 
     return logouted;
+  }
+
+  async changePassword(token: string, newPassword: NewPassword) {
+    const payload = this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    const user = await this.prisma.usuario.findUnique({
+      where: {
+        id_usuario: payload.sub,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('operación no aprovada');
+    }
+
+    if (newPassword.new_password == newPassword.refresh_password) {
+      if (await compare(newPassword.contraseña, user.contraseña_hash)) {
+        const updatedPassword = await hash(newPassword.new_password, 10);
+
+        return await this.prisma.usuario.update({
+          where: {
+            id_usuario: payload.sub,
+          },
+          data: {
+            contraseña_hash: updatedPassword,
+          },
+        });
+      }
+    }
   }
 }

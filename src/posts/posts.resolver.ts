@@ -65,7 +65,6 @@ export class PostsResolver {
       },
       userId,
     );
-    console.log(feed);
     return feed;
   }
 
